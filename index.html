@@ -398,6 +398,88 @@
             background-color: rgba(1, 70, 188, 0.05);
         }
 
+        /* --- STILI DI STAMPA PER PDF --- */
+        @media print {
+            /* Nascondi tutto di default */
+            body * {
+                visibility: hidden;
+            }
+
+            /* Mostra solo il contenuto del playground */
+            #tab-playground, #tab-playground * {
+                visibility: visible;
+            }
+
+            /* Nascondi gli elementi UI non necessari */
+            header, .tab-nav, #tab-generator, 
+            .playground-col-controls label, #json-input, 
+            #btn-preview, #btn-export-png, #btn-export-pdf, 
+            .carousel-nav, #suggerimenti-output, 
+            .playground-output-box h3:first-child /* Nasconde "Suggerimenti Visual" singolo */
+            {
+                display: none !important;
+            }
+
+            /* Resetta la pagina per la stampa */
+            body {
+                background-color: #ffffff;
+                margin: 0;
+                padding: 0;
+            }
+
+            #tab-playground {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 1rem;
+                box-shadow: none;
+                border: none;
+            }
+
+            .playground-grid {
+                display: block;
+            }
+
+            /* Forza lo stack verticale delle slide */
+            .carousel-scroller {
+                display: block;
+                overflow: visible;
+                height: auto;
+            }
+
+            .carousel-slide {
+                display: block;
+                width: 90%; /* Adatta alla pagina */
+                margin: 0 auto;
+                height: auto;
+                aspect-ratio: unset; /* Rimuovi aspect ratio fisso */
+                padding: 1.5rem;
+                border: 2px solid var(--colore-bordo);
+                box-shadow: none;
+                page-break-after: always; /* Ogni slide su una nuova pagina */
+            }
+
+            .carousel-slide:last-child {
+                page-break-after: auto;
+            }
+
+            /* Assicura che i box di output siano visibili */
+            .playground-output-box, 
+            #riepilogo-suggerimenti-stampa {
+                display: block !important; /* Forza la visualizzazione del riepilogo */
+                page-break-before: always; /* Metti i riepiloghi in una nuova pagina */
+                border: 1px solid #ccc;
+                box-shadow: none;
+            }
+
+            .playground-output-box h3, 
+            #riepilogo-suggerimenti-stampa h3 {
+                color: #000;
+                border-bottom: 2px solid #666;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -510,7 +592,8 @@
                         <small id="json-error">Errore: Il JSON non è valido o ha una struttura errata.</small>
                     </div>
                     <button class="btn btn-primary" id="btn-preview" onclick="renderPreview(this)">Visualizza Anteprima</button>
-                    <button class="btn btn-secondary" id="btn-export" onclick="exportPlayground(this)" style="margin-left: 0.5rem;">Esporta Immagine</button>
+                    <button class="btn btn-secondary" id="btn-export-png" onclick="exportSlidePNG(this)" style="margin-left: 0.5rem;">Esporta Slide (PNG)</button>
+                    <button class="btn btn-secondary" id="btn-export-pdf" onclick="exportToPDF(this)" style="margin-left: 0.5rem; background: #eee; color: #333; border: 2px solid #ddd;">Esporta PDF Completo</button>
 
 
                     <!-- Output Copy Post -->
@@ -518,6 +601,14 @@
                         <h3>Copy del Post (Modificabile)</h3>
                         <div class="playground-output-content" id="copy-post-output" contenteditable="true">
                             <p style="color: #888;">Il copy del post generato dall'AI apparirà qui...</p>
+                        </div>
+                    </div>
+
+                    <!-- Box nascosto per riepilogo stampa -->
+                    <div class="playground-output-box" id="riepilogo-suggerimenti-stampa" style="display: none;">
+                        <h3>Riepilogo Suggerimenti Visual</h3>
+                        <div class="playground-output-content" id="riepilogo-suggerimenti-output">
+                            <!-- Contenuto generato da JS -->
                         </div>
                     </div>
                 </div>
@@ -531,11 +622,11 @@
         let currentSlideIndex = 0;
         let totalSlides = 0;
         const scroller = document.getElementById('carousel-scroller');
-        const pager = document.getElementById('carousel-pager');
-        const btnPrev = document.getElementById('carousel-prev');
-        const btnNext = document.getElementById('carousel-next');
-        const suggerimentiOutput = document.getElementById('suggerimenti-output');
+        let suggerimentiOutput = document.getElementById('suggerimenti-output');
         let slideSuggerimenti = [];
+
+        // Aggiungi listener per salvare le modifiche ai suggerimenti
+        suggerimentiOutput.addEventListener('blur', saveSuggerimento);
 
         // --- GESTIONE TAB ---
         function openTab(event, tabName) {
@@ -735,6 +826,9 @@ Esempio di struttura JSON:
                 // 3. Inizializza il carosello
                 currentSlideIndex = 0;
                 updateCarouselState();
+                
+                // 4. Popola il riepilogo per la stampa
+                updateRiepilogoStampa();
 
             } catch (e) {
                 console.error("Errore parsing JSON:", e);
@@ -745,6 +839,33 @@ Esempio di struttura JSON:
                 currentSlideIndex = 0;
                 updateCarouselState();
             }
+        }
+
+        // Salva il suggerimento modificato nell'array
+        function saveSuggerimento() {
+            if (totalSlides > 0 && currentSlideIndex < slideSuggerimenti.length) {
+                slideSuggerimenti[currentSlideIndex] = suggerimentiOutput.innerHTML;
+                // Aggiorna anche il riepilogo di stampa
+                updateRiepilogoStampa();
+            }
+        }
+
+        // Popola il box di riepilogo nascosto per la stampa
+        function updateRiepilogoStampa() {
+            const riepilogoContainer = document.getElementById('riepilogo-suggerimenti-output');
+            if (totalSlides === 0) {
+                riepilogoContainer.innerHTML = '';
+                return;
+            }
+            
+            let html = '<ul>';
+            slideSuggerimenti.forEach((sugg, index) => {
+                // Rimuove i tag <p> per una lista più pulita
+                const cleanSugg = sugg.replace(/^<p>/i, '').replace(/<\/p>$/i, '');
+                html += `<li style="margin-bottom: 0.75rem;"><strong>Slide ${index + 1}:</strong> ${cleanSugg}</li>`;
+            });
+            html += '</ul>';
+            riepilogoContainer.innerHTML = html;
         }
 
         // Aggiorna Pager, Bottoni e Suggerimenti
@@ -758,7 +879,7 @@ Esempio di struttura JSON:
 
             // Aggiorna Suggerimenti
             if (slideSuggerimenti[currentSlideIndex]) {
-                suggerimentiOutput.innerHTML = `<p>${slideSuggerimenti[currentSlideIndex]}</p>`;
+                suggerimentiOutput.innerHTML = slideSuggerimenti[currentSlideIndex];
             } else if (totalSlides === 0) {
                  suggerimentiOutput.innerHTML = '<p style="color: #888;">...</p>';
             }
@@ -766,6 +887,9 @@ Esempio di struttura JSON:
 
         // Gestisce lo scroll del carosello
         function scrollCarousel(direction) {
+            // Salva il suggerimento corrente PRIMA di cambiare slide
+            saveSuggerimento();
+
             const newIndex = currentSlideIndex + direction;
             if (newIndex < 0 || newIndex >= totalSlides) {
                 return;
@@ -791,7 +915,7 @@ Esempio di struttura JSON:
         });
 
         // Esporta l'area playground come immagine
-        function exportPlayground(button) {
+        function exportSlidePNG(button) {
             showButtonFeedback(button, 'Esportazione...');
             const exportArea = document.getElementById('playground-export-area');
             
@@ -818,8 +942,15 @@ Esempio di struttura JSON:
             });
         }
 
+        // Apre il dialogo di stampa per salvare come PDF
+        function exportToPDF(button) {
+            // Salva l'ultimo suggerimento modificato prima di stampare
+            saveSuggerimento();
+            showButtonFeedback(button, 'Prepara stampa...');
+            window.print();
+        }
+
     </script>
 </body>
 </html>
-
 
