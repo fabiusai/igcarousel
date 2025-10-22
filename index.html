@@ -591,9 +591,19 @@
                         <textarea id="json-input" rows="10" placeholder="Incolla qui il blocco JSON restituito dall'AI..."></textarea>
                         <small id="json-error">Errore: Il JSON non è valido o ha una struttura errata.</small>
                     </div>
-                    <button class="btn btn-primary" id="btn-preview" onclick="renderPreview(this)">Visualizza Anteprima</button>
-                    <button class="btn btn-secondary" id="btn-export-png" onclick="exportSlidePNG(this)" style="margin-left: 0.5rem;">Esporta Slide (PNG)</button>
-                    <button class="btn btn-secondary" id="btn-export-pdf" onclick="exportToPDF(this)" style="margin-left: 0.5rem; background: #eee; color: #333; border: 2px solid #ddd;">Esporta PDF Completo</button>
+                    
+                    <!-- Gruppo bottoni di azione -->
+                    <div class="button-group" style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <button class="btn btn-primary" id="btn-preview" onclick="renderPreview(this)">Visualizza Anteprima</button>
+                        <button class="btn" id="btn-clear-json" onclick="clearJsonInput(this)" style="background: #e0e0e0; color: #333; border: 2px solid #ccc;">Svuota JSON</button>
+                    </div>
+        
+                    <!-- Gruppo bottoni di esportazione -->
+                    <div class="button-group" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <button class="btn btn-secondary" id="btn-export-png" onclick="exportSlidePNG(this)">Esporta Slide (PNG)</button>
+                        <button class="btn btn-secondary" id="btn-export-pdf" onclick="exportToPDF(this)" style="background: #eee; color: #333; border: 2px solid #ddd;">Esporta PDF Completo</button>
+                        <button class="btn btn-secondary" id="btn-copy-all-text" onclick="copyAllSlideText(this)" style="background: #eee; color: #333; border: 2px solid #ddd;">Copia Testi Slide</button>
+                    </div>
 
 
                     <!-- Output Copy Post -->
@@ -624,6 +634,12 @@
         const scroller = document.getElementById('carousel-scroller');
         let suggerimentiOutput = document.getElementById('suggerimenti-output');
         let slideSuggerimenti = [];
+
+        // *** FIX 1: Definizioni mancanti per i controlli del carosello ***
+        const pager = document.getElementById('carousel-pager');
+        const btnPrev = document.getElementById('carousel-prev');
+        const btnNext = document.getElementById('carousel-next');
+
 
         // Aggiungi listener per salvare le modifiche ai suggerimenti
         suggerimentiOutput.addEventListener('blur', saveSuggerimento);
@@ -777,12 +793,18 @@ Esempio di struttura JSON:
             }
         }
 
+        // Svuota la casella JSON
+        function clearJsonInput(button) {
+            document.getElementById('json-input').value = '';
+            showButtonFeedback(button, 'Svuotato!');
+        }
+
         // --- GESTIONE PLAYGROUND ---
 
         // Renderizza l'anteprima dal JSON
         function renderPreview(button) {
             showButtonFeedback(button, 'Caricamento...');
-            const jsonInput = document.getElementById('json-input').value;
+            let jsonInput = document.getElementById('json-input').value;
             const errorMsg = document.getElementById('json-error');
             const copyOutput = document.getElementById('copy-post-output');
 
@@ -791,7 +813,10 @@ Esempio di struttura JSON:
             errorMsg.style.display = 'none';
 
             try {
-                const data = JSON.parse(jsonInput);
+                // *** FIX 2: Pulisce il JSON da spazi non validi (non-breaking spaces) ***
+                const cleanJsonInput = jsonInput.replace(/\u00A0/g, " ");
+
+                const data = JSON.parse(cleanJsonInput); // Usa l'input pulito
 
                 // Valida struttura base
                 if (!data.slides || !Array.isArray(data.slides) || !data.copy_post) {
@@ -948,6 +973,53 @@ Esempio di struttura JSON:
             saveSuggerimento();
             showButtonFeedback(button, 'Prepara stampa...');
             window.print();
+        }
+
+        // Copia tutto il testo delle slide
+        function copyAllSlideText(button) {
+            const slides = document.querySelectorAll('#carousel-scroller .carousel-slide [contenteditable=\"true\"]');
+            if (slides.length === 0 || totalSlides === 0) {
+                showButtonFeedback(button, 'Niente da copiare');
+                return;
+            }
+
+            let allText = '';
+            slides.forEach((slide, index) => {
+                // .textContent estrae solo il testo, ignorando l'HTML
+                const text = slide.textContent || slide.innerText; 
+                allText += `--- SLIDE ${index + 1} ---\n`;
+                allText += text.trim(); // Pulisce spazi bianchi extra
+                allText += '\n\n';
+            });
+
+            // Creare un textarea temporaneo per copiare
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.style.position = 'absolute';
+            tempTextarea.style.left = '-9999px'; // Nascondilo
+            tempTextarea.value = allText.trim();
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            tempTextarea.setSelectionRange(0, 99999);
+
+            try {
+                var successful = document.execCommand('copy');
+                if (successful) {
+                    showButtonFeedback(button, 'Testi copiati!');
+                } else {
+                    // Fallback per browser moderni
+                    navigator.clipboard.writeText(tempTextarea.value).then(() => {
+                        showButtonFeedback(button, 'Testi copiati! (fb)');
+                    }).catch(err => {
+                        console.warn('Fallback copia fallito:', err);
+                        showButtonFeedback(button, 'Copia fallita');
+                    });
+                }
+            } catch (err) {
+                console.error('Errore durante la copia dei testi:', err);
+                showButtonFeedback(button, 'Errore copia');
+            }
+            
+            document.body.removeChild(tempTextarea);
         }
 
     </script>
