@@ -201,6 +201,29 @@
             border-color: #d4c400;
         }
 
+        /* Stile per bottoni "neutri" (grigi) */
+        .btn-neutral {
+            background-color: #f0f0f0; /* Grigio chiaro */
+            color: #333;
+            border: 2px solid #dcdcdc;
+        }
+
+        .btn-neutral:hover {
+            background-color: #e0e0e0;
+            border-color: #ccc;
+        }
+
+        /* Titoli per sottosezioni nel playground */
+        .subsection-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--colore-neutro-scuro);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--colore-bordo);
+            padding-bottom: 0.25rem;
+        }
+
         .btn-danger {
             background-color: var(--colore-errore);
             color: var(--colore-testo-chiaro);
@@ -539,6 +562,7 @@
 
             <div class="section">
                 <button class="btn btn-primary" id="btn-genera" onclick="generatePrompt(this)">Genera Prompt</button>
+                <button class="btn" id="btn-reset-generator" onclick="resetGenerator(this)" style="margin-left: 0.5rem; background: #e0e0e0; color: #333; border: 2px solid #ccc;">Reset Campi</button>
                 
                 <div id="prompt-output-container" style="display: none;">
                     <h2 class="section-title" style="margin-top: 2.5rem;">Prompt Generato</h2>
@@ -581,33 +605,44 @@
                             <p style="color: #888;">I suggerimenti per l'immagine della slide corrente appariranno qui...</p>
                         </div>
                     </div>
+
+                    <!-- Bottone Copia Testi (Spostato qui) -->
+                    <button class="btn btn-neutral" id="btn-copy-all-text" onclick="copyAllSlideText(this)" style="margin-top: 1rem; width: 100%;">
+                        Copia Testi Slide
+                    </button>
                 </div>
 
                 <!-- Colonna Destra: Input e Copy -->
                 <div class="playground-col-controls">
                     <h2 class="section-title">Dati Anteprima</h2>
                     <div class="form-group">
-                        <label for="json-input">Incolla il JSON generato dall'AI</label>
-                        <textarea id="json-input" rows="10" placeholder="Incolla qui il blocco JSON restituito dall'AI..."></textarea>
+                        <label for="json-input">Incolla o importa il JSON generato</label>
+                        <textarea id="json-input" rows="10" placeholder="Incolla qui il blocco JSON restituito dall'AI o usa 'Importa JSON'..."></textarea>
                         <small id="json-error">Errore: Il JSON non è valido o ha una struttura errata.</small>
                     </div>
                     
-                    <!-- Gruppo bottoni di azione -->
-                    <div class="button-group" style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                        <button class="btn btn-primary" id="btn-preview" onclick="renderPreview(this)">Visualizza Anteprima</button>
-                        <button class="btn" id="btn-clear-json" onclick="clearJsonInput(this)" style="background: #e0e0e0; color: #333; border: 2px solid #ccc;">Svuota JSON</button>
+                    <!-- Input file nascosto per l'importazione -->
+                    <input type="file" id="json-importer" accept=".json,application/json" style="display: none;" onchange="importJSON(event)">
+
+                    <!-- Gruppo Azioni Dati -->
+                    <h3 class="subsection-title">Azioni Dati</h3>
+                    <div class="button-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                        <button class="btn btn-primary" id="btn-preview" onclick="renderPreview(this)" style="grid-column: 1 / -1;">Visualizza Anteprima</button>
+                        <button class="btn btn-neutral" id="btn-clear-json" onclick="clearJsonInput(this)">Svuota JSON</button>
+                        <button class="btn btn-neutral" id="btn-import-json" onclick="triggerImportJSON(this)">Importa JSON</button>
+                        <button class="btn btn-neutral" id="btn-export-json" onclick="exportJSON(this)" style="grid-column: 1 / -1;">Esporta JSON con modifiche</button>
+                    </div>
+
+                    <!-- Gruppo Esportazioni Visive -->
+                    <h3 class="subsection-title">Esporta Viste</h3>
+                    <div class="button-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                        <button class="btn btn-secondary" id="btn-export-png" onclick="exportSlidePNG(this)">Esporta Slide (PNG)</button>
+                        <button class="btn btn-neutral" id="btn-export-pdf" onclick="exportToPDF(this)">Esporta PDF Completo</button>
                     </div>
         
-                    <!-- Gruppo bottoni di esportazione -->
-                    <div class="button-group" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                        <button class="btn btn-secondary" id="btn-export-png" onclick="exportSlidePNG(this)">Esporta Slide (PNG)</button>
-                        <button class="btn btn-secondary" id="btn-export-pdf" onclick="exportToPDF(this)" style="background: #eee; color: #333; border: 2px solid #ddd;">Esporta PDF Completo</button>
-                        <button class="btn btn-secondary" id="btn-copy-all-text" onclick="copyAllSlideText(this)" style="background: #eee; color: #333; border: 2px solid #ddd;">Copia Testi Slide</button>
-                    </div>
-
 
                     <!-- Output Copy Post -->
-                    <div class="playground-output-box" style="margin-top: 2.5rem;">
+                    <div class="playground-output-box" style="margin-top: 2rem;">
                         <h3>Copy del Post (Modificabile)</h3>
                         <div class="playground-output-content" id="copy-post-output" contenteditable="true">
                             <p style="color: #888;">Il copy del post generato dall'AI apparirà qui...</p>
@@ -791,6 +826,20 @@ Esempio di struttura JSON:
                 console.error('Errore durante la copia:', err);
                 showButtonFeedback(button, 'Errore copia');
             }
+        }
+
+        // Resetta i campi del generatore
+        function resetGenerator(button) {
+            document.getElementById('argomento').value = '';
+            document.getElementById('contenuto').value = '';
+            document.getElementById('links-container').innerHTML = '';
+            document.getElementById('allegati').checked = false;
+            document.getElementById('note-aggiuntive').value = '';
+            
+            document.getElementById('prompt-output-container').style.display = 'none';
+            document.getElementById('prompt-output').value = '';
+            
+            showButtonFeedback(button, 'Campi resettati!');
         }
 
         // Svuota la casella JSON
@@ -1022,7 +1071,84 @@ Esempio di struttura JSON:
             document.body.removeChild(tempTextarea);
         }
 
+        // --- Funzioni Import/Export JSON ---
+
+        // Esporta il JSON corrente con le modifiche
+        function exportJSON(button) {
+            if (totalSlides === 0) {
+                showButtonFeedback(button, 'Nessun dato');
+                return;
+            }
+            showButtonFeedback(button, 'Esportazione...');
+
+            // Salva l'ultimo suggerimento
+            saveSuggerimento();
+
+            // 1. Raccogli il copy
+            const copyText = document.getElementById('copy-post-output').textContent || '';
+
+            // 2. Raccogli i dati delle slide
+            const slideElements = document.querySelectorAll('#carousel-scroller .carousel-slide [contenteditable="true"]');
+            const slidesData = [];
+
+            slideElements.forEach((el, index) => {
+                slidesData.push({
+                    testo_formattato: el.innerHTML,
+                    suggerimento_visual: slideSuggerimenti[index] || '(Nessun suggerimento)'
+                });
+            });
+
+            // 3. Costruisci l'oggetto JSON
+            const exportObj = {
+                numero_slide_consigliato: totalSlides,
+                copy_post: copyText.trim(),
+                slides: slidesData
+            };
+
+            // 4. Crea e scarica il file
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "storyboard_modificato.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // Attiva il clic sull'input file nascosto
+        function triggerImportJSON(button) {
+            showButtonFeedback(button, 'Apri finestra...');
+            document.getElementById('json-importer').click();
+        }
+
+        // Legge il file JSON importato
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const text = e.target.result;
+                    document.getElementById('json-input').value = text;
+                    // Avvia automaticamente l'anteprima
+                    renderPreview(document.getElementById('btn-preview'));
+                } catch (err) {
+                    console.error("Errore lettura file:", err);
+                    document.getElementById('json-error').style.display = 'block';
+                }
+            };
+            reader.readAsText(file);
+
+            // Resetta l'input per permettere di ricaricare lo stesso file
+            event.target.value = null;
+        }
+
+
     </script>
 </body>
 </html>
+
 
