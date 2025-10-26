@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generatore Prompt Carosello</title>
     <link rel="icon" href="favicon.ico">
-    <!-- Script per html2canvas (esportazione immagine) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
     <style>
+        /* ...tutto il tuo CSS rimane invariato... */
+        
         /* Stile Globale e Variabili Colore */
         :root {
             --colore-primario: #0146bc; /* Blu */
@@ -20,7 +19,36 @@
             --colore-neutro-chiaro: #f9f9f9;
             --colore-neutro-scuro: #555;
             --colore-errore: #d93025;
+
+            /* --- NUOVE VARIABILI TEMA TESTO --- */
+            /* Questi sono i default per il Tema Standard */
+            --colore-testo-h1: var(--colore-primario);
+            --colore-testo-p: var(--colore-testo);
+            --colore-testo-small: var(--colore-neutro-scuro);
+            --colore-testo-strong: var(--colore-primario);
+            --colore-blockquote-border: var(--colore-secondario);
+            --colore-blockquote-text: var(--colore-neutro-scuro);
         }
+
+        /* --- STILI TEMA NEGATIVO (PER SLIDE) --- */
+        /* Questa classe viene aggiunta a .carousel-slide */
+        .carousel-slide.theme-negativo {
+            /* Sfondo scuro per leggibilità */
+            background-color: #222; 
+            
+            /* Blu -> Giallo */
+            --colore-testo-h1: var(--colore-secondario);
+            --colore-testo-strong: var(--colore-secondario);
+            
+            /* Nero/Grigio -> Bianco */
+            --colore-testo-p: var(--colore-testo-chiaro);
+            --colore-testo-small: var(--colore-testo-chiaro);
+            --colore-blockquote-text: var(--colore-testo-chiaro);
+
+            /* Giallo -> Blu */
+            --colore-blockquote-border: var(--colore-primario);
+        }
+
 
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -53,7 +81,7 @@
             text-align: center;
         }
 
-        /* Navigazione Tab */
+        /* NavigAZIONE Tab */
         .tab-nav {
             display: flex;
             border-bottom: 2px solid var(--colore-bordo);
@@ -127,17 +155,25 @@
         }
 
         input[type="text"],
+        input[type="number"], 
+        input[type="range"],
         textarea {
             width: 100%;
             padding: 0.85rem;
             font-size: 1rem;
             border: 2px solid var(--colore-bordo);
             border-radius: 8px;
-            box-sizing: border-box; /* Importante per width: 100% */
+            box-sizing: border-box; 
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        input[type="range"] {
+            padding: 0.25rem;
         }
 
         input[type="text"]:focus,
+        input[type="number"]:focus, 
+        input[type="range"]:focus,
         textarea:focus {
             outline: none;
             border-color: var(--colore-primario);
@@ -149,12 +185,18 @@
             resize: vertical;
         }
 
-        /* Checkbox */
+        /* Checkbox (usato per Tema e per Generatore) */
         .checkbox-group {
             display: flex;
             align-items: center;
             gap: 0.75rem;
             cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        .checkbox-group:hover {
+            background-color: var(--colore-neutro-chiaro);
         }
         
         input[type="checkbox"] {
@@ -163,6 +205,11 @@
             accent-color: var(--colore-primario);
             cursor: pointer;
         }
+        .checkbox-group label {
+            margin-bottom: 0; /* Override */
+            cursor: pointer;
+        }
+
 
         /* Bottoni */
         .btn {
@@ -266,7 +313,7 @@
 
         @media (min-width: 1024px) {
             .playground-grid {
-                /* (Carousel + Suggerimenti) | (JSON Input + Copy) */
+                /* (Carousel + Suggerimenti) | (JSON Input + Controlli) */
                 grid-template-columns: minmax(350px, 450px) 1fr;
             }
         }
@@ -292,7 +339,13 @@
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch; /* Abilita scrolling inerziale su iOS */
+            -webkit-overflow-scrolling: touch; 
+            
+            /* --- VARIABILI GLOBALI TESTO --- */
+            /* Queste vengono modificate da JS */
+            --global-font-size-multiplier: 1;
+            --global-line-height: 1.6;
+            --global-letter-spacing: 0px;
         }
 
         .carousel-slide {
@@ -306,10 +359,15 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            overflow: auto;
+            overflow: auto; 
             border-right: 1px solid var(--colore-bordo);
+            
+            position: relative; 
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
         }
-        
+                
         .carousel-slide:last-child {
             border-right: none;
         }
@@ -343,36 +401,49 @@
             cursor: not-allowed;
         }
 
-        /* Stile Testi Slide (come da richiesta AI) */
-        .carousel-slide [contenteditable="true"] {
-            outline: none;
+        /* Stile Testi Slide (ora usa VARIABILI) */
+        .text-overlay-block {
+            position: relative; 
+            cursor: move;
+            z-index: 10;
+            width: 90%; 
+            max-width: 90%; 
+            box-sizing: border-box;
+            
+            /* Stili globali applicati qui */
+            line-height: var(--global-line-height);
+            letter-spacing: var(--global-letter-spacing);
         }
 
-        .carousel-slide h1 {
-            font-size: 2rem;
-            color: var(--colore-primario);
+        .text-overlay-block h1 {
+            /* JS imposta --local-h1-size (es. 2.5rem) */
+            /* Il default è 2rem se non impostato */
+            font-size: calc(var(--local-h1-size, 2rem) * var(--global-font-size-multiplier));
+            color: var(--colore-testo-h1);
             margin: 0 0 1rem 0;
-            line-height: 1.2;
+            line-height: 1.2; /* Line-height locale per h1 */
         }
-        .carousel-slide p {
-            font-size: 1.1rem;
+        .text-overlay-block p {
+            font-size: calc(var(--local-p-size, 1.1rem) * var(--global-font-size-multiplier));
             margin: 0.5rem 0;
+            color: var(--colore-testo-p);
         }
-        .carousel-slide strong {
-            color: var(--colore-primario);
+        .text-overlay-block strong {
+            color: var(--colore-testo-strong);
             font-weight: 700;
         }
-        .carousel-slide blockquote {
-            border-left: 4px solid var(--colore-secondario);
+        .text-overlay-block blockquote {
+            border-left: 4px solid var(--colore-blockquote-border);
             padding-left: 1.25rem;
             margin: 1rem 0;
             font-style: italic;
-            font-size: 1.1rem;
-            color: var(--colore-neutro-scuro);
+            font-size: calc(var(--local-p-size, 1.1rem) * var(--global-font-size-multiplier)); /* Usa stessa size di P */
+            color: var(--colore-blockquote-text);
         }
-        .carousel-slide small {
-            font-size: 0.85rem;
-            opacity: 0.8;
+        .text-overlay-block small {
+            font-size: calc(var(--local-small-size, 0.85rem) * var(--global-font-size-multiplier));
+            color: var(--colore-testo-small);
+            opacity: 0.9;
             display: block;
             margin-top: 1rem;
         }
@@ -407,43 +478,140 @@
             display: none;
             margin-top: 0.5rem;
         }
-
-        [contenteditable="true"] {
+        
+        .text-overlay-block[contenteditable="true"] {
             outline: 2px dashed transparent;
             transition: outline 0.2s ease;
-            padding: 0.25rem;
+            padding: 0.5rem; 
             border-radius: 4px;
         }
 
-        [contenteditable="true"]:hover,
-        [contenteditable="true"]:focus {
+        .text-overlay-block[contenteditable="true"]:hover,
+        .text-overlay-block[contenteditable="true"]:focus-within {
             outline: 2px dashed var(--colore-primario);
-            background-color: rgba(1, 70, 188, 0.05);
+            background-color: rgba(255, 255, 255, 0.2); 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+        
+        /* Tema negativo outline */
+        .carousel-slide.theme-negativo .text-overlay-block[contenteditable="true"]:hover,
+        .carousel-slide.theme-negativo .text-overlay-block[contenteditable="true"]:focus-within {
+             outline: 2px dashed var(--colore-secondario);
+             background-color: rgba(255, 255, 255, 0.1); 
+        }
+
+
+        /* Griglia Stili Granulari (Ora solo Dimensione) */
+        .style-grid {
+            display: grid;
+            grid-template-columns: auto 1fr; /* Label, Dimensione (rem) */
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .style-grid label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--colore-neutro-scuro);
+        }
+        .style-grid input[type="number"] {
+            padding: 0.5rem; /* Ridotto per griglia */
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        /* Griglia Stili Globali */
+        .global-style-grid {
+            display: grid;
+            grid-template-columns: auto 1fr auto; /* Label, Range, Valore */
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .global-style-grid label {
+             font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--colore-neutro-scuro);
+            margin-bottom: 0;
+        }
+        .global-style-grid span {
+            font-family: monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 45px;
+            text-align: right;
+        }
+
+        /* --- STILI CUSTOM ALERT MODAL --- */
+        .alert-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s;
+        }
+        .alert-modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .alert-modal-box {
+            background: var(--colore-testo-chiaro);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+        }
+        .alert-modal-overlay.visible .alert-modal-box {
+            transform: scale(1);
+        }
+        .alert-modal-box p {
+            margin: 0 0 1.5rem 0;
+            font-size: 1.1rem;
+            color: var(--colore-testo);
+        }
+        /* --- Fine STILI CUSTOM ALERT MODAL --- */
+
 
         /* --- STILI DI STAMPA PER PDF --- */
         @media print {
-            /* Nascondi tutto di default */
             body * {
                 visibility: hidden;
             }
 
-            /* Mostra solo il contenuto del playground */
             #tab-playground, #tab-playground * {
                 visibility: visible;
             }
 
-            /* Nascondi gli elementi UI non necessari */
             header, .tab-nav, #tab-generator, 
             .playground-col-controls label, #json-input, 
-            #btn-preview, #btn-export-png, #btn-export-pdf, 
+            /* RIMOSSO: #btn-export-png */
+            #btn-export-svg, #btn-export-pdf, 
             .carousel-nav, #suggerimenti-output, 
-            .playground-output-box h3:first-child /* Nasconde "Suggerimenti Visual" singolo */
+            .playground-output-box h3:first-child,
+            #btn-upload-bg, #image-uploader,
+            .subsection-title,
+            .form-group, /* Nasconde vecchi form-group */
+            .style-grid, /* Nasconde nuova griglia stili locali */
+            .global-style-grid, /* Nasconde griglia stili globali */
+            #btn-apply-styles, /* Nasconde nuovo bottone locali */
+            #btn-apply-global-styles, /* Nasconde bottone globali */
+            #local-theme-toggle-group /* Nasconde tema locale */
             {
                 display: none !important;
             }
 
-            /* Resetta la pagina per la stampa */
             body {
                 background-color: #ffffff;
                 margin: 0;
@@ -464,7 +632,6 @@
                 display: block;
             }
 
-            /* Forza lo stack verticale delle slide */
             .carousel-scroller {
                 display: block;
                 overflow: visible;
@@ -473,25 +640,48 @@
 
             .carousel-slide {
                 display: block;
-                width: 90%; /* Adatta alla pagina */
+                width: 90%; 
                 margin: 0 auto;
                 height: auto;
-                aspect-ratio: unset; /* Rimuovi aspect ratio fisso */
+                aspect-ratio: unset; 
                 padding: 1.5rem;
                 border: 2px solid var(--colore-bordo);
                 box-shadow: none;
-                page-break-after: always; /* Ogni slide su una nuova pagina */
+                page-break-after: always; 
+                
+                background-size: cover !important;
+                background-position: center !important;
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
             }
+            
+            .text-overlay-block {
+                position: relative !important; 
+                top: auto !important;
+                left: auto !important;
+                width: 100% !important;
+            }
+            /* Forza stili leggibili per la stampa (ignora tema) */
+            .text-overlay-block, .text-overlay-block * {
+                color: #000 !important;
+                background: transparent !important;
+                line-height: 1.5 !important;
+                letter-spacing: normal !important;
+            }
+            /* Forza font-size specifici per stampa se necessario */
+            .text-overlay-block h1 { font-size: 24pt !important; }
+            .text-overlay-block p { font-size: 11pt !important; }
+            .text-overlay-block small { font-size: 8pt !important; }
+
 
             .carousel-slide:last-child {
                 page-break-after: auto;
             }
 
-            /* Assicura che i box di output siano visibili */
             .playground-output-box, 
             #riepilogo-suggerimenti-stampa {
-                display: block !important; /* Forza la visualizzazione del riepilogo */
-                page-break-before: always; /* Metti i riepiloghi in una nuova pagina */
+                display: block !important; 
+                page-break-before: always; 
                 border: 1px solid #ccc;
                 box-shadow: none;
             }
@@ -512,15 +702,13 @@
             <h1>Generatore Prompt Carosello</h1>
         </header>
 
-        <!-- Navigazione Tab -->
         <nav class="tab-nav">
             <button class="tab-button active" onclick="openTab(event, 'tab-generator')">1. Generatore Prompt</button>
             <button class="tab-button" onclick="openTab(event, 'tab-playground')">2. Playground Anteprima</button>
         </nav>
 
-        <!-- ================== TAB 1: GENERATORE ================== -->
         <div id="tab-generator" class="tab-content active">
-            <div class="section">
+             <div class="section">
                 <h2 class="section-title">Dati per l'AI</h2>
                 <p>Inserisci le informazioni base per generare lo storyboard del carosello.</p>
 
@@ -541,8 +729,7 @@
                 <div class="form-group">
                     <label>3. Link a fonti esterne (opzionale)</label>
                     <div id="links-container">
-                        <!-- I link dinamici verranno aggiunti qui -->
-                    </div>
+                        </div>
                     <button class="btn btn-secondary" onclick="addLink()" style="margin-top: 0.5rem; background: #eee; color: #333; border: 2px solid #ddd;">+ Aggiungi Link</button>
                 </div>
 
@@ -550,7 +737,7 @@
                     <label>4. Materiali aggiuntivi</label>
                     <label class="checkbox-group">
                         <input type="checkbox" id="allegati">
-                        <span>Segnala all'AI che invierai materiali allegati (es. immagini, PDF) insieme al prompt.</span>
+                        <label for="allegati">Segnala all'AI che invierai materiali allegati (es. immagini, PDF) insieme al prompt.</label>
                     </label>
                 </div>
 
@@ -573,24 +760,20 @@
             </div>
         </div>
 
-        <!-- ================== TAB 2: PLAYGROUND ================== -->
         <div id="tab-playground" class="tab-content">
             
             <div class="playground-grid">
 
-                <!-- Colonna Sinistra: Preview -->
                 <div class="playground-col-preview" id="playground-export-area">
                     <h2 class="section-title">Anteprima Carosello</h2>
                     
                     <div class="carousel-preview-container">
                         <div class="carousel-scroller" id="carousel-scroller">
-                            <!-- Slide vuota di default -->
                             <div class="carousel-slide" style="background-color: #eee; align-items: center; text-align: center; color: #888;">
                                 <p>Incolla il JSON e clicca "Visualizza Anteprima" per generare le slide.</p>
                             </div>
                         </div>
 
-                        <!-- Navigazione Carousel -->
                         <div class="carousel-nav">
                             <button class="carousel-nav-btn" id="carousel-prev" onclick="scrollCarousel(-1)" disabled>&larr;</button>
                             <span id="carousel-pager" style="align-self: center; color: var(--colore-neutro-scuro); font-weight: 600;">Slide 0 / 0</span>
@@ -598,7 +781,6 @@
                         </div>
                     </div>
 
-                    <!-- Output Suggerimenti -->
                     <div class="playground-output-box">
                         <h3>Suggerimenti Visual (Modificabile)</h3>
                         <div class="playground-output-content" id="suggerimenti-output" contenteditable="true">
@@ -606,13 +788,18 @@
                         </div>
                     </div>
 
-                    <!-- Bottone Copia Testi (Spostato qui) -->
-                    <button class="btn btn-neutral" id="btn-copy-all-text" onclick="copyAllSlideText(this)" style="margin-top: 1rem; width: 100%;">
-                        Copia Testi Slide
-                    </button>
+                    <input type="file" id="image-uploader" accept="image/*" style="display: none;" onchange="applyBackgroundImage(event)">
+                    
+                    <div class="button-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem;">
+                        <button class="btn btn-neutral" id="btn-upload-bg" onclick="triggerImageUpload(this)">
+                            Carica Sfondo
+                        </button>
+                        <button class="btn btn-neutral" id="btn-copy-all-text" onclick="copyAllSlideText(this)">
+                            Copia Testi Slide
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Colonna Destra: Input e Copy -->
                 <div class="playground-col-controls">
                     <h2 class="section-title">Dati Anteprima</h2>
                     <div class="form-group">
@@ -621,10 +808,8 @@
                         <small id="json-error">Errore: Il JSON non è valido o ha una struttura errata.</small>
                     </div>
                     
-                    <!-- Input file nascosto per l'importazione -->
                     <input type="file" id="json-importer" accept=".json,application/json" style="display: none;" onchange="importJSON(event)">
 
-                    <!-- Gruppo Azioni Dati -->
                     <h3 class="subsection-title">Azioni Dati</h3>
                     <div class="button-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
                         <button class="btn btn-primary" id="btn-preview" onclick="renderPreview(this)" style="grid-column: 1 / -1;">Visualizza Anteprima</button>
@@ -632,16 +817,57 @@
                         <button class="btn btn-neutral" id="btn-import-json" onclick="triggerImportJSON(this)">Importa JSON</button>
                         <button class="btn btn-neutral" id="btn-export-json" onclick="exportJSON(this)" style="grid-column: 1 / -1;">Esporta JSON con modifiche</button>
                     </div>
+                    
+                    <h3 class="subsection-title">Stile Globale (Tutte le Slide)</h3>
 
-                    <!-- Gruppo Esportazioni Visive -->
+                    <div class="global-style-grid">
+                        <label for="global-size-input">Dimensione</label>
+                        <input type="range" id="global-size-input" value="1" min="0.5" max="2" step="0.05" oninput="updateGlobalStyleValue('global-size-value', this.value, 'x')">
+                        <span id="global-size-value">1.00x</span>
+                        
+                        <label for="global-line-height-input">Interlinea</label>
+                        <input type="range" id="global-line-height-input" value="1.6" min="1" max="3" step="0.1" oninput="updateGlobalStyleValue('global-line-height-value', this.value, '')">
+                        <span id="global-line-height-value">1.6</span>
+                        
+                        <label for="global-letter-spacing-input">Spaziatura</label>
+                        <input type="range" id="global-letter-spacing-input" value="0" min="-1" max="5" step="0.1" oninput="updateGlobalStyleValue('global-letter-spacing-value', this.value, 'px')">
+                        <span id="global-letter-spacing-value">0.0px</span>
+                    </div>
+                    <button class="btn btn-secondary" id="btn-apply-global-styles" onclick="applyGlobalStyles(this)" style="width: 100%; margin-top: 0.5rem;">
+                        Applica Stili Globali
+                    </button>
+
+
+                    <h3 class="subsection-title">Stile Locale (Slide Corrente)</h3>
+                    <p style="font-size: 0.9rem; color: #666; margin-top: -0.5rem; margin-bottom: 1rem;">Modifica la dimensione di base e il tema per questa slide.</p>
+                    
+                    <div class="form-group" id="local-theme-toggle-group">
+                        <label class="checkbox-group">
+                            <input type="checkbox" id="local-theme-toggle">
+                            <label for="local-theme-toggle">Attiva Tema Negativo (Testo Chiaro)</label>
+                        </label>
+                    </div>
+
+                    <div class="style-grid">
+                        <label for="h1-size-input">Dimensione Titolo (h1)</label>
+                        <input type="number" id="h1-size-input" value="2" min="0.5" max="5" step="0.1" title="Dimensione in rem">
+                        
+                        <label for="p-size-input">Dimensione Corpo (p)</label>
+                        <input type="number" id="p-size-input" value="1.1" min="0.5" max="3" step="0.1" title="Dimensione in rem">
+                        
+                        <label for="small-size-input">Dimensione Small (small)</label>
+                        <input type="number" id="small-size-input" value="0.85" min="0.5" max="2" step="0.1" title="Dimensione in rem">
+                    </div>
+                    <button class="btn btn-neutral" id="btn-apply-styles" onclick="applyLocalStyles(this)" style="width: 100%; margin-top: 0.5rem;">
+                        Applica Stili Locali
+                    </button>
+
+
                     <h3 class="subsection-title">Esporta Viste</h3>
                     <div class="button-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-                        <button class="btn btn-secondary" id="btn-export-png" onclick="exportSlidePNG(this)">Esporta Slide (PNG)</button>
-                        <button class="btn btn-neutral" id="btn-export-pdf" onclick="exportToPDF(this)">Esporta PDF Completo</button>
+                        <button class="btn btn-primary" id="btn-export-svg" onclick="exportSlideSVG(this)" style="background-color: #4CAF50; min-width: auto;">Esporta Testo (SVG)</button>
+                        <button class="btn btn-neutral" id="btn-export-pdf" onclick="exportToPDF(this)">Esporta PDF</button>
                     </div>
-        
-
-                    <!-- Output Copy Post -->
                     <div class="playground-output-box" style="margin-top: 2rem;">
                         <h3>Copy del Post (Modificabile)</h3>
                         <div class="playground-output-content" id="copy-post-output" contenteditable="true">
@@ -649,12 +875,10 @@
                         </div>
                     </div>
 
-                    <!-- Box nascosto per riepilogo stampa -->
                     <div class="playground-output-box" id="riepilogo-suggerimenti-stampa" style="display: none;">
                         <h3>Riepilogo Suggerimenti Visual</h3>
                         <div class="playground-output-content" id="riepilogo-suggerimenti-output">
-                            <!-- Contenuto generato da JS -->
-                        </div>
+                            </div>
                     </div>
                 </div>
 
@@ -663,20 +887,52 @@
 
     </div>
 
+    <div id="custom-alert-overlay" class="alert-modal-overlay">
+        <div class="alert-modal-box">
+            <p id="custom-alert-message">Messaggio di errore.</p>
+            <button class="btn btn-primary" onclick="hideCustomAlert()">OK</button>
+        </div>
+    </div>
+
     <script>
         let currentSlideIndex = 0;
         let totalSlides = 0;
         const scroller = document.getElementById('carousel-scroller');
+        // Rimosso: const playgroundTab = document.getElementById('tab-playground');
         let suggerimentiOutput = document.getElementById('suggerimenti-output');
+        
         let slideSuggerimenti = [];
+        let slideBackgrounds = []; 
+        let slideTextStyles = []; // Conterrà oggetti per { h1: { fontSize }, p: { fontSize }, small: { fontSize }, themeNegativo, position... }
+        
+        // Stato globale per stili globali (senza tema)
+        let globalTextStyles = {
+            multiplier: 1,
+            lineHeight: 1.6,
+            letterSpacing: '0px',
+        };
 
-        // *** FIX 1: Definizioni mancanti per i controlli del carosello ***
         const pager = document.getElementById('carousel-pager');
         const btnPrev = document.getElementById('carousel-prev');
         const btnNext = document.getElementById('carousel-next');
+        
+        // --- GESTIONE CUSTOM ALERT ---
+        function showCustomAlert(message) {
+            document.getElementById('custom-alert-message').textContent = message;
+            document.getElementById('custom-alert-overlay').classList.add('visible');
+        }
+        function hideCustomAlert() {
+            document.getElementById('custom-alert-overlay').classList.remove('visible');
+        }
+        document.getElementById('custom-alert-overlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideCustomAlert();
+            }
+        });
+        // --- FINE GESTIONE CUSTOM ALERT ---
 
 
-        // Aggiungi listener per salvare le modifiche ai suggerimenti
+        // Listener per salvare le modifiche ai suggerimenti
         suggerimentiOutput.addEventListener('blur', saveSuggerimento);
 
         // --- GESTIONE TAB ---
@@ -695,13 +951,10 @@
         }
 
         // --- GESTIONE GENERATORE ---
-
-        // Aggiungi un campo input per i link
         function addLink() {
             const container = document.getElementById('links-container');
             const linkItem = document.createElement('div');
             linkItem.className = 'link-item';
-            
             linkItem.innerHTML = `
                 <input type="text" class="link-input" placeholder="https://...">
                 <button class="btn btn-danger" onclick="this.parentElement.remove()">X</button>
@@ -709,40 +962,30 @@
             container.appendChild(linkItem);
         }
 
-        // Feedback sui bottoni
         function showButtonFeedback(button, message, duration = 2000) {
             const originalText = button.innerHTML;
             button.innerHTML = message;
             button.disabled = true;
-
             setTimeout(() => {
                 button.innerHTML = originalText;
                 button.disabled = false;
             }, duration);
         }
 
-        // Genera il prompt per l'AI
         function generatePrompt(button) {
-            // Aggiunto log per debug
-            console.log('Inizio generazione prompt...');
             showButtonFeedback(button, 'Generazione...');
-            
-            // 1. Raccogli i dati
             const argomento = document.getElementById('argomento').value;
             const contenuto = document.getElementById('contenuto').value;
             const allegati = document.getElementById('allegati').checked;
             const noteAggiuntive = document.getElementById('note-aggiuntive').value;
-
             const linkInputs = document.querySelectorAll('.link-input');
             const links = Array.from(linkInputs).map(input => input.value).filter(val => val.trim() !== '');
 
-            // 2. Costruisci il prompt
+            // Prompt aggiornato
             const prompt = `
 Sei un esperto social media manager e copywriter specializzato in contenuti informativi per brand istituzionali.
-
 IL TUO COMPITO:
 Crea uno storyboard dettagliato per un post carousel di Instagram (da un minimo di 3 a un massimo di 10 slide) basandoti sui seguenti dati.
-
 DATI DI INPUT:
 - Argomento: ${argomento || 'Non specificato'}
 - Contenuto Principale: """
@@ -751,98 +994,79 @@ ${contenuto || 'Non specificato'}
 ${links.length > 0 ? `- Link di riferimento: \n${links.map(l => `  - ${l}`).join('\n')}` : ''}
 - Presenza Materiali Allegati: ${allegati ? 'Sì' : 'No'}
 - Note Aggiuntive: ${noteAggiuntive || 'Nessuna'}
-
 REGOLE DI STILE E CONTENUTO:
 1.  Tono di voce: Istituzionale, chiaro, informativo, fresco e giornalistico.
 2.  Non usare la seconda persona (tu/voi). Mantenere un tono oggettivo.
 3.  L'azienda autrice del post deve essere indicata in terza persona (es. "L'Azienda offre...", "Il servizio permette...").
-
 REQUISITI DELLO STORYBOARD:
 Devi produrre TRE elementi:
 1.  numero_slide_consigliato: Un numero (tra 3 e 10) che ritieni ottimale.
 2.  copy_post: Un testo per la caption di Instagram, scritto secondo le regole di stile.
-3.  slides: Un array di oggetti, uno per ogni slide.
-
+3.  global_text_styles: Includi questo campo con valore '{}' (un oggetto vuoto).
+4.  slides: Un array di oggetti, uno per ogni slide.
 STRUTTURA OGGETTO SLIDE:
 Ogni oggetto nell'array "slides" DEVE contenere:
 -   "testo_formattato": Una stringa HTML con i testi della slide. Usa questa gerarchia:
-    -   '<h1>' per il titolo della slide (usalo sulla prima slide per il titolo del post).
+    -   '<h1>' per il titolo della slide.
     -   '<p>' per il testo principale.
     -   '<strong>' per evidenziare termini chiave.
     -   '<blockquote>' per citazioni o dati rilevanti.
     -   '<small>' per note a piè di pagina o testi secondari.
-    Sintetizza e struttura il contenuto fornito in modo creativo ed efficace.
--   "suggerimento_visual": Una breve descrizione testuale dell'immagine di sfondo o dell'elemento grafico suggerito per quella slide.
-
+-   "suggerimento_visual": Una breve descrizione testuale dell'immagine di sfondo.
+-   "background_image": Includi questo campo con valore 'null'.
+-   "text_styles": Includi questo campo con valore '{}' (un oggetto vuoto). (Conterrà 'themeNegativo: true/false' dopo la modifica manuale)
 FORMATO DI OUTPUT OBBLIGATORIO:
 Restituisci ESCLUSIVAMENTE un singolo blocco di codice JSON valido. Non aggiungere spiegazioni prima o dopo il JSON.
-
 Esempio di struttura JSON:
 {
   "numero_slide_consigliato": 5,
-  "copy_post": "Il nuovo servizio X è ora disponibile. L'azienda conferma il suo impegno per l'innovazione, offrendo soluzioni all'avanguardia per...",
+  "copy_post": "Il nuovo servizio X è ora disponibile...",
+  "global_text_styles": {},
   "slides": [
     {
       "testo_formattato": "<h1>Titolo Slide 1</h1><p>Testo di introduzione...</p>",
-      "suggerimento_visual": "Immagine astratta blu e gialla ad alto impatto."
+      "suggerimento_visual": "Immagine astratta blu e gialla.",
+      "background_image": null,
+      "text_styles": {}
     },
     {
-      "testo_formattato": "<p>Questa è una <strong>parola chiave</strong>.</p><blockquote>Dichiarazione importante</blockquote>",
-      "suggerimento_visual": "Icona stilizzata che rappresenta il servizio."
+      "testo_formattato": "<p>Questa è una <strong>parola chiave</strong>.</p><small>Nota a piè di pagina.</small>",
+      "suggerimento_visual": "Icona stilizzata che rappresenta il servizio.",
+      "background_image": null,
+      "text_styles": {}
     }
   ]
 }
 `;
-            // 3. Mostra l'output
             const outputContainer = document.getElementById('prompt-output-container');
             const outputTextarea = document.getElementById('prompt-output');
-            
             outputTextarea.value = prompt.trim();
             outputContainer.style.display = 'block';
         }
 
-        // Copia il prompt generato
         function copyPrompt(button) {
             const outputTextarea = document.getElementById('prompt-output');
             outputTextarea.select();
-            outputTextarea.setSelectionRange(0, 99999); // Per compatibilità mobile
-
+            outputTextarea.setSelectionRange(0, 99999);
             try {
-                // Usa document.execCommand('copy') come metodo primario per compatibilità iframe
                 var successful = document.execCommand('copy');
-                if (successful) {
-                    showButtonFeedback(button, 'Copiato!');
-                } else {
-                    // Fallback se execCommand non è supportato o fallisce
-                    console.warn('execCommand fallito, tentativo con navigator.clipboard');
-                    navigator.clipboard.writeText(outputTextarea.value).then(() => {
-                        showButtonFeedback(button, 'Copiato! (fallback)');
-                    }).catch(err => {
-                        console.error('Errore copia fallback:', err);
-                        showButtonFeedback(button, 'Copia fallita');
-                    });
-                }
+                showButtonFeedback(button, successful ? 'Copiato!' : 'Copia fallita');
             } catch (err) {
-                console.error('Errore durante la copia:', err);
                 showButtonFeedback(button, 'Errore copia');
             }
         }
 
-        // Resetta i campi del generatore
         function resetGenerator(button) {
             document.getElementById('argomento').value = '';
             document.getElementById('contenuto').value = '';
             document.getElementById('links-container').innerHTML = '';
             document.getElementById('allegati').checked = false;
             document.getElementById('note-aggiuntive').value = '';
-            
             document.getElementById('prompt-output-container').style.display = 'none';
             document.getElementById('prompt-output').value = '';
-            
             showButtonFeedback(button, 'Campi resettati!');
         }
 
-        // Svuota la casella JSON
         function clearJsonInput(button) {
             document.getElementById('json-input').value = '';
             showButtonFeedback(button, 'Svuotato!');
@@ -850,58 +1074,102 @@ Esempio di struttura JSON:
 
         // --- GESTIONE PLAYGROUND ---
 
-        // Renderizza l'anteprima dal JSON
         function renderPreview(button) {
             showButtonFeedback(button, 'Caricamento...');
             let jsonInput = document.getElementById('json-input').value;
             const errorMsg = document.getElementById('json-error');
             const copyOutput = document.getElementById('copy-post-output');
 
-            scroller.innerHTML = ''; // Pulisci slide precedenti
-            slideSuggerimenti = []; // Pulisci suggerimenti
+            scroller.innerHTML = ''; 
+            slideSuggerimenti = []; 
+            slideBackgrounds = [];
+            slideTextStyles = []; // Resetta gli stili
+
+            // Resetta stato globale a default
+            globalTextStyles = { multiplier: 1, lineHeight: 1.6, letterSpacing: '0px' };
+
             errorMsg.style.display = 'none';
 
             try {
-                // *** FIX 2: Pulisce il JSON da spazi non validi (non-breaking spaces) ***
                 const cleanJsonInput = jsonInput.replace(/\u00A0/g, " ");
+                const data = JSON.parse(cleanJsonInput);
 
-                const data = JSON.parse(cleanJsonInput); // Usa l'input pulito
-
-                // Valida struttura base
                 if (!data.slides || !Array.isArray(data.slides) || !data.copy_post) {
                     throw new Error('Struttura JSON non valida.');
                 }
                 
-                // 1. Popola il Copy del Post
+                // Carica stili globali se esistono
+                if (data.global_text_styles && typeof data.global_text_styles === 'object') {
+                    globalTextStyles.multiplier = data.global_text_styles.multiplier || 1;
+                    globalTextStyles.lineHeight = data.global_text_styles.lineHeight || 1.6;
+                    globalTextStyles.letterSpacing = data.global_text_styles.letterSpacing || '0px';
+                }
+                // Applica stili globali caricati
+                applyGlobalStylesToDOM();
+                updateGlobalStyleInputs();
+                
                 copyOutput.innerHTML = `<p>${data.copy_post.replace(/\n/g, '<br>')}</p>`;
-
-                // 2. Popola le Slide
                 totalSlides = data.slides.length;
                 if (totalSlides === 0) {
                      throw new Error('Nessuna slide trovata nel JSON.');
                 }
+                
+                slideBackgrounds = new Array(totalSlides).fill(null);
+                slideTextStyles = new Array(totalSlides).fill({}); // Inizializza come oggetti vuoti
 
                 data.slides.forEach((slideData, index) => {
                     const slide = document.createElement('div');
                     slide.className = 'carousel-slide';
                     
-                    // Crea un contenitore editabile per il testo
                     const textContent = document.createElement('div');
+                    textContent.className = 'text-overlay-block'; 
                     textContent.setAttribute('contenteditable', 'true');
-                    textContent.innerHTML = slideData.testo_formattato || '<p>(Testo mancante)</p>';
+                    
+                    let cleanHtml = slideData.testo_formattato || '<p>(Testo mancante)</p>';
+                    textContent.innerHTML = cleanHtml.replace(/\u00A0/g, " ");
+
+                    // Applica stili granulari salvati
+                    if (slideData.text_styles) {
+                        const styles = slideData.text_styles;
+                        
+                        if (styles.h1 && styles.h1.fontSize) {
+                            textContent.style.setProperty('--local-h1-size', styles.h1.fontSize);
+                        }
+                        if (styles.p && styles.p.fontSize) {
+                            textContent.style.setProperty('--local-p-size', styles.p.fontSize);
+                        }
+                        if (styles.small && styles.small.fontSize) {
+                            textContent.style.setProperty('--local-small-size', styles.small.fontSize);
+                        }
+                        
+                        // Applica stili di posizionamento
+                        if (styles.position) textContent.style.position = styles.position;
+                        if (styles.top) textContent.style.top = styles.top;
+                        if (styles.left) textContent.style.left = styles.left;
+
+                        // Applica tema locale
+                        if (styles.themeNegativo) {
+                            slide.classList.add('theme-negativo');
+                        }
+
+                        // Salva l'intero oggetto stile
+                        slideTextStyles[index] = { ...styles };
+                    }
+
                     slide.appendChild(textContent);
+                    makeDraggable(textContent, index); 
 
+                    if (slideData.background_image) {
+                        slide.style.backgroundImage = `url(${slideData.background_image})`;
+                        slideBackgrounds[index] = slideData.background_image; 
+                    }
+                    
                     scroller.appendChild(slide);
-
-                    // Salva i suggerimenti
                     slideSuggerimenti.push(slideData.suggerimento_visual || '(Nessun suggerimento)');
                 });
 
-                // 3. Inizializza il carosello
                 currentSlideIndex = 0;
                 updateCarouselState();
-                
-                // 4. Popola il riepilogo per la stampa
                 updateRiepilogoStampa();
 
             } catch (e) {
@@ -915,26 +1183,21 @@ Esempio di struttura JSON:
             }
         }
 
-        // Salva il suggerimento modificato nell'array
         function saveSuggerimento() {
             if (totalSlides > 0 && currentSlideIndex < slideSuggerimenti.length) {
                 slideSuggerimenti[currentSlideIndex] = suggerimentiOutput.innerHTML;
-                // Aggiorna anche il riepilogo di stampa
                 updateRiepilogoStampa();
             }
         }
 
-        // Popola il box di riepilogo nascosto per la stampa
         function updateRiepilogoStampa() {
             const riepilogoContainer = document.getElementById('riepilogo-suggerimenti-output');
             if (totalSlides === 0) {
                 riepilogoContainer.innerHTML = '';
                 return;
             }
-            
             let html = '<ul>';
             slideSuggerimenti.forEach((sugg, index) => {
-                // Rimuove i tag <p> per una lista più pulita
                 const cleanSugg = sugg.replace(/^<p>/i, '').replace(/<\/p>$/i, '');
                 html += `<li style="margin-bottom: 0.75rem;"><strong>Slide ${index + 1}:</strong> ${cleanSugg}</li>`;
             });
@@ -942,170 +1205,357 @@ Esempio di struttura JSON:
             riepilogoContainer.innerHTML = html;
         }
 
-        // Aggiorna Pager, Bottoni e Suggerimenti
+        // Aggiorna i soli input locali
         function updateCarouselState() {
-            // Aggiorna Pager
             pager.textContent = `Slide ${currentSlideIndex + 1} / ${totalSlides}`;
-            
-            // Aggiorna Bottoni
             btnPrev.disabled = (currentSlideIndex === 0);
             btnNext.disabled = (currentSlideIndex === totalSlides - 1 || totalSlides === 0);
 
-            // Aggiorna Suggerimenti
-            if (slideSuggerimenti[currentSlideIndex]) {
+            if (totalSlides > 0) {
                 suggerimentiOutput.innerHTML = slideSuggerimenti[currentSlideIndex];
-            } else if (totalSlides === 0) {
+
+                // AGGIORNA CONTROLLI DI STILE LOCALI (Dimensione e Tema)
+                const currentStyles = slideTextStyles[currentSlideIndex] || {};
+                
+                const defaults = {
+                    h1: { fontSize: '2rem' },
+                    p: { fontSize: '1.1rem' },
+                    small: { fontSize: '0.85rem' },
+                    themeNegativo: false
+                };
+
+                const h1Styles = currentStyles.h1 || defaults.h1;
+                const pStyles = currentStyles.p || defaults.p;
+                const smallStyles = currentStyles.small || defaults.small;
+
+                // Popola Dimensioni
+                document.getElementById('h1-size-input').value = parseFloat(h1Styles.fontSize) || parseFloat(defaults.h1.fontSize);
+                document.getElementById('p-size-input').value = parseFloat(pStyles.fontSize) || parseFloat(defaults.p.fontSize);
+                document.getElementById('small-size-input').value = parseFloat(smallStyles.fontSize) || parseFloat(defaults.small.fontSize);
+                
+                // Popola Tema Locale
+                const themeNegativo = currentStyles.themeNegativo || defaults.themeNegativo;
+                document.getElementById('local-theme-toggle').checked = themeNegativo;
+
+
+            } else {
                  suggerimentiOutput.innerHTML = '<p style="color: #888;">...</p>';
             }
         }
 
-        // Gestisce lo scroll del carosello
-        function scrollCarousel(direction) {
-            // Salva il suggerimento corrente PRIMA di cambiare slide
-            saveSuggerimento();
+        // --- NUOVE FUNZIONI STILE ---
 
+        // (Rimossa) function toggleTheme(isNegativo) { ... }
+
+        function updateGlobalStyleValue(elementId, value, suffix) {
+            let displayValue = parseFloat(value).toFixed(suffix === 'x' ? 2 : 1);
+            document.getElementById(elementId).textContent = displayValue + suffix;
+        }
+
+        function updateGlobalStyleInputs() {
+            document.getElementById('global-size-input').value = globalTextStyles.multiplier;
+            document.getElementById('global-line-height-input').value = globalTextStyles.lineHeight;
+            document.getElementById('global-letter-spacing-input').value = parseFloat(globalTextStyles.letterSpacing);
+            
+            updateGlobalStyleValue('global-size-value', globalTextStyles.multiplier, 'x');
+            updateGlobalStyleValue('global-line-height-value', globalTextStyles.lineHeight, '');
+            updateGlobalStyleValue('global-letter-spacing-value', globalTextStyles.letterSpacing, 'px');
+        }
+
+        function applyGlobalStylesToDOM() {
+            scroller.style.setProperty('--global-font-size-multiplier', globalTextStyles.multiplier);
+            scroller.style.setProperty('--global-line-height', globalTextStyles.lineHeight);
+            scroller.style.setProperty('--global-letter-spacing', globalTextStyles.letterSpacing);
+        }
+
+        function applyGlobalStyles(button) {
+            globalTextStyles.multiplier = document.getElementById('global-size-input').value;
+            globalTextStyles.lineHeight = document.getElementById('global-line-height-input').value;
+            globalTextStyles.letterSpacing = document.getElementById('global-letter-spacing-input').value + 'px';
+            applyGlobalStylesToDOM();
+            showButtonFeedback(button, 'Stili Globali Applicati!');
+        }
+
+
+        // Applica stili locali
+        function applyLocalStyles(button) {
+            if (totalSlides === 0) {
+                showButtonFeedback(button, 'Nessuna slide');
+                return;
+            }
+
+            const allSlides = scroller.querySelectorAll('.carousel-slide'); // Ora prende .carousel-slide
+            const currentSlideElement = allSlides[currentSlideIndex];
+            if (!currentSlideElement) return;
+            const currentTextBlock = currentSlideElement.querySelector('.text-overlay-block');
+
+            // 1. Leggi i valori dagli input
+            const h1Size = document.getElementById('h1-size-input').value + 'rem';
+            const pSize = document.getElementById('p-size-input').value + 'rem';
+            const smallSize = document.getElementById('small-size-input').value + 'rem';
+            const isNegativo = document.getElementById('local-theme-toggle').checked;
+
+            // 2. Costruisci l'oggetto stili (dimensioni + tema)
+            const newStyles = {
+                h1: { fontSize: h1Size },
+                p: { fontSize: pSize },
+                small: { fontSize: smallSize },
+                themeNegativo: isNegativo
+            };
+
+            // 3. Applica gli stili come variabili CSS locali al blocco testo
+            currentTextBlock.style.setProperty('--local-h1-size', h1Size);
+            currentTextBlock.style.setProperty('--local-p-size', pSize);
+            currentTextBlock.style.setProperty('--local-small-size', smallSize);
+            
+            // Applica/rimuovi classe tema alla slide
+            currentSlideElement.classList.toggle('theme-negativo', isNegativo);
+
+
+            // 4. Salva nello stato globale, preservando la posizione
+            if (!slideTextStyles[currentSlideIndex]) {
+                slideTextStyles[currentSlideIndex] = {};
+            }
+            // Unisci i nuovi stili di testo (h1, p, small, tema) con la posizione esistente (top, left, etc)
+            Object.assign(slideTextStyles[currentSlideIndex], newStyles);
+
+            showButtonFeedback(button, 'Stili Locali Applicati!');
+        }
+
+
+        function scrollCarousel(direction) {
+            saveSuggerimento();
             const newIndex = currentSlideIndex + direction;
             if (newIndex < 0 || newIndex >= totalSlides) {
                 return;
             }
-            
             const scrollAmount = scroller.clientWidth * newIndex;
             scroller.scrollTo({
                 left: scrollAmount,
                 behavior: 'smooth'
             });
-            
             currentSlideIndex = newIndex;
             updateCarouselState();
         }
 
-        // Listener per aggiornare lo stato se l'utente scrolla manualmente
         scroller.addEventListener('scroll', () => {
             const index = Math.round(scroller.scrollLeft / scroller.clientWidth);
             if (index !== currentSlideIndex && index < totalSlides) {
+                saveSuggerimento();
                 currentSlideIndex = index;
                 updateCarouselState();
             }
         });
 
-        // Esporta l'area playground come immagine
-        function exportSlidePNG(button) {
-            showButtonFeedback(button, 'Esportazione...');
-            const exportArea = document.getElementById('playground-export-area');
-            
-            // Rimuovi temporaneamente gli outline per la foto
-            const editables = exportArea.querySelectorAll('[contenteditable="true"]');
-            editables.forEach(el => el.style.outline = 'none');
+        // *** INIZIO MODIFICA JS - PNG RIMOSSO ***
+        
+        // Funzione 'exportSlidePNG' rimossa
+        
+        // *** FINE MODIFICA JS - PNG RIMOSSO ***
+        
+        
+        // --- INIZIO CORREZIONE SVG (FONT UNIVERSALI) ---
+        function exportSlideSVG(button) {
+            if (totalSlides === 0) {
+                showButtonFeedback(button, 'Nessuna slide');
+                return;
+            }
+            showButtonFeedback(button, 'Esporta SVG...');
 
-            html2canvas(exportArea, {
-                useCORS: true, // Per eventuali immagini di sfondo future
-                scale: 2 // Scala 2x per qualità migliore
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'anteprima-carousel.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+            const allSlides = scroller.querySelectorAll('.carousel-slide');
+            const currentSlideElement = allSlides[currentSlideIndex];
+            const textBlock = currentSlideElement.querySelector('.text-overlay-block');
+
+            // 1. Get dimensioni
+            const slideRect = currentSlideElement.getBoundingClientRect();
+            const width = slideRect.width;
+            const height = slideRect.height; 
+
+            // 2. Get stato
+            const isNegativo = currentSlideElement.classList.contains('theme-negativo');
+
+            // 3. RISOLVI GLI STILI (con font universali)
+            let resolvedStyleBlock = '';
+            const selector = 'h1, p, small, strong, blockquote';
+            const elements = textBlock.querySelectorAll(selector);
+            const styleMap = new Map();
+            const universalFontStack = 'Arial, Helvetica, sans-serif'; // FONT UNIVERSALE
+
+            // Funzione helper per processare gli elementi
+            const processElement = (el) => {
+                if (!el) return;
+                const tagName = el.tagName.toLowerCase();
+                if (styleMap.has(tagName)) return; // Già processato
                 
-                // Ripristina gli outline
-                editables.forEach(el => el.style.outline = '');
-            }).catch(err => {
-                console.error("Errore durante l'esportazione:", err);
-                alert("Si è verificato un errore durante l'esportazione.");
-                // Ripristina gli outline
-                editables.forEach(el => el.style.outline = '');
+                const st = window.getComputedStyle(el);
+                styleMap.set(tagName, `
+        ${tagName} { 
+            font-family: ${universalFontStack}; /* MODIFICA: Font universale */
+            font-size: ${st.fontSize}; 
+            font-weight: ${st.fontWeight};
+            font-style: ${st.fontStyle};
+            fill: ${st.color};  /* 'fill' per SVG */
+            color: ${st.color}; /* 'color' per HTML */
+            letter-spacing: ${st.letterSpacing};
+            word-spacing: ${st.wordSpacing};
+            line-height: ${st.lineHeight};
+            margin: ${st.margin};
+            padding: ${st.padding};
+            display: ${st.display}; /* 'small' è display:block */
+            opacity: ${st.opacity};
+            /* Per blockquote */
+            border-left: ${st.borderLeft};
+            padding-left: ${st.paddingLeft};
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }`);
+            };
+
+            // Processa gli elementi trovati
+            elements.forEach(processElement);
+            // Assicurati che i tag principali siano presenti
+            if (!styleMap.has('h1')) processElement(textBlock.querySelector('h1') || document.createElement('h1'));
+            if (!styleMap.has('p')) processElement(textBlock.querySelector('p') || document.createElement('p'));
+            if (!styleMap.has('small')) processElement(textBlock.querySelector('small') || document.createElement('small'));
+            
+            styleMap.forEach(style => (resolvedStyleBlock += style));
+
+            // Aggiungi lo stile del contenitore .text-overlay-block
+            const textBlockStyles = window.getComputedStyle(textBlock);
+            resolvedStyleBlock += `
+        .text-overlay-block {
+            font-family: ${universalFontStack}; /* MODIFICA: Font universale */
+            box-sizing: border-box;
+            width: 90%; 
+            max-width: 90%;
+            padding: 0.5rem;
+            margin: 0;
+            line-height: ${textBlockStyles.lineHeight};
+            letter-spacing: ${textBlockStyles.letterSpacing};
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }`;
+
+            // 4. Get HTML content
+            let cleanHtml = textBlock.innerHTML.replace(/\u00A0/g, " ");
+            
+            // 5. Get stili inline (per posizione T/L)
+            const textBlockInlineStyles = textBlock.style.cssText;
+
+            // 6. Crea SVG (con dichiarazioni XML e stili risolti)
+            const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+    
+    <style>
+        ${resolvedStyleBlock}
+    </style>
+    
+    <foreignObject width="100%" height="100%" style="${textBlockInlineStyles}">
+        <div xmlns="http://www.w3.org/1999/xhtml" class="text-overlay-block ${isNegativo ? 'theme-negativo' : ''}">
+            ${cleanHtml}
+        </div>
+    </foreignObject>
+</svg>`;
+            
+            // 7. Create download (usando un Blob per maggior robustezza)
+            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", url);
+            downloadAnchorNode.setAttribute("download", `slide_testo_${currentSlideIndex + 1}.svg`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            document.body.removeChild(downloadAnchorNode);
+            URL.revokeObjectURL(url); // Libera memoria
+            
+            showButtonFeedback(button, 'Esporta Testo (SVG)');
+        }
+        // --- FINE CORREZIONE SVG ---
+
+
+        function exportToPDF(button) {
+            saveSuggerimento();
+            showButtonFeedback(button, 'Prepara stampa...');
+            
+            const oldGlobalLetterSpacing = scroller.style.getPropertyValue('--global-letter-spacing');
+            scroller.querySelectorAll('.text-overlay-block').forEach(el => {
+                el.style.letterSpacing = 'normal';
+                el.style.wordSpacing = 'normal';
+            });
+            scroller.style.setProperty('--global-letter-spacing', 'normal');
+            
+            window.print();
+            
+            scroller.style.setProperty('--global-letter-spacing', oldGlobalLetterSpacing);
+            scroller.querySelectorAll('.text-overlay-block').forEach(el => {
+                el.style.letterSpacing = ''; 
+                el.style.wordSpacing = ''; 
             });
         }
 
-        // Apre il dialogo di stampa per salvare come PDF
-        function exportToPDF(button) {
-            // Salva l'ultimo suggerimento modificato prima di stampare
-            saveSuggerimento();
-            showButtonFeedback(button, 'Prepara stampa...');
-            window.print();
-        }
-
-        // Copia tutto il testo delle slide
         function copyAllSlideText(button) {
-            const slides = document.querySelectorAll('#carousel-scroller .carousel-slide [contenteditable=\"true\"]');
+            const slides = document.querySelectorAll('#carousel-scroller .text-overlay-block');
             if (slides.length === 0 || totalSlides === 0) {
                 showButtonFeedback(button, 'Niente da copiare');
                 return;
             }
-
             let allText = '';
             slides.forEach((slide, index) => {
-                // .textContent estrae solo il testo, ignorando l'HTML
                 const text = slide.textContent || slide.innerText; 
                 allText += `--- SLIDE ${index + 1} ---\n`;
-                allText += text.trim(); // Pulisce spazi bianchi extra
+                allText += text.trim();
                 allText += '\n\n';
             });
 
-            // Creare un textarea temporaneo per copiare
             const tempTextarea = document.createElement('textarea');
             tempTextarea.style.position = 'absolute';
-            tempTextarea.style.left = '-9999px'; // Nascondilo
+            tempTextarea.style.left = '-9999px';
             tempTextarea.value = allText.trim();
             document.body.appendChild(tempTextarea);
             tempTextarea.select();
             tempTextarea.setSelectionRange(0, 99999);
-
             try {
                 var successful = document.execCommand('copy');
-                if (successful) {
-                    showButtonFeedback(button, 'Testi copiati!');
-                } else {
-                    // Fallback per browser moderni
-                    navigator.clipboard.writeText(tempTextarea.value).then(() => {
-                        showButtonFeedback(button, 'Testi copiati! (fb)');
-                    }).catch(err => {
-                        console.warn('Fallback copia fallito:', err);
-                        showButtonFeedback(button, 'Copia fallita');
-                    });
-                }
+                showButtonFeedback(button, successful ? 'Testi copiati!' : 'Copia fallita');
             } catch (err) {
-                console.error('Errore durante la copia dei testi:', err);
                 showButtonFeedback(button, 'Errore copia');
             }
-            
             document.body.removeChild(tempTextarea);
         }
 
         // --- Funzioni Import/Export JSON ---
-
-        // Esporta il JSON corrente con le modifiche
         function exportJSON(button) {
             if (totalSlides === 0) {
                 showButtonFeedback(button, 'Nessun dato');
                 return;
             }
             showButtonFeedback(button, 'Esportazione...');
-
-            // Salva l'ultimo suggerimento
             saveSuggerimento();
 
-            // 1. Raccogli il copy
             const copyText = document.getElementById('copy-post-output').textContent || '';
-
-            // 2. Raccogli i dati delle slide
-            const slideElements = document.querySelectorAll('#carousel-scroller .carousel-slide [contenteditable="true"]');
+            const slideElements = document.querySelectorAll('#carousel-scroller .text-overlay-block');
             const slidesData = [];
 
             slideElements.forEach((el, index) => {
+                const cleanHtml = el.innerHTML.replace(/\u00A0/g, " ");
+
                 slidesData.push({
-                    testo_formattato: el.innerHTML,
-                    suggerimento_visual: slideSuggerimenti[index] || '(Nessun suggerimento)'
+                    testo_formattato: cleanHtml, 
+                    suggerimento_visual: slideSuggerimenti[index] || '(Nessun suggerimento)',
+                    background_image: slideBackgrounds[index] || null,
+                    text_styles: slideTextStyles[index] || {} // Salva stili locali (dimensioni + posizione + tema)
                 });
             });
 
-            // 3. Costruisci l'oggetto JSON
             const exportObj = {
                 numero_slide_consigliato: totalSlides,
                 copy_post: copyText.trim(),
+                global_text_styles: globalTextStyles, // Salva solo stili globali (no tema)
                 slides: slidesData
             };
 
-            // 4. Crea e scarica il file
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
@@ -1115,25 +1565,21 @@ Esempio di struttura JSON:
             downloadAnchorNode.remove();
         }
 
-        // Attiva il clic sull'input file nascosto
         function triggerImportJSON(button) {
             showButtonFeedback(button, 'Apri finestra...');
             document.getElementById('json-importer').click();
         }
 
-        // Legge il file JSON importato
         function importJSON(event) {
             const file = event.target.files[0];
             if (!file) {
                 return;
             }
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const text = e.target.result;
                     document.getElementById('json-input').value = text;
-                    // Avvia automaticamente l'anteprima
                     renderPreview(document.getElementById('btn-preview'));
                 } catch (err) {
                     console.error("Errore lettura file:", err);
@@ -1141,14 +1587,108 @@ Esempio di struttura JSON:
                 }
             };
             reader.readAsText(file);
-
-            // Resetta l'input per permettere di ricaricare lo stesso file
             event.target.value = null;
         }
 
+        // --- Funzioni Immagini e Posizionamento ---
+
+        function triggerImageUpload(button) {
+            if (totalSlides === 0) {
+                showButtonFeedback(button, 'Crea anteprima');
+                return;
+            }
+            document.getElementById('image-uploader').click();
+        }
+
+        function applyBackgroundImage(event) {
+            const file = event.target.files[0];
+            if (!file || totalSlides === 0) {
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataURL = e.target.result;
+                const allSlides = scroller.querySelectorAll('.carousel-slide');
+                const currentSlideElement = allSlides[currentSlideIndex];
+                if (currentSlideElement) {
+                    currentSlideElement.style.backgroundImage = `url(${dataURL})`;
+                    slideBackgrounds[currentSlideIndex] = dataURL;
+                }
+            };
+            reader.readAsDataURL(file); 
+            event.target.value = null;
+        }
+
+        // Funzione per rendere il blocco trascinabile
+        function makeDraggable(element, index) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            element.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                if (e.target.closest('h1, p, small, strong, blockquote')) {
+                     if (e.target !== element) {
+                         return;
+                     }
+                }
+                
+                e = e || window.event;
+                e.preventDefault(); 
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                
+                if (element.style.position !== 'absolute') {
+                    const parentRect = element.parentElement.getBoundingClientRect();
+                    const rect = element.getBoundingClientRect();
+                    element.style.position = 'absolute';
+                    element.style.top = (rect.top - parentRect.top) + 'px';
+                    element.style.left = (rect.left - parentRect.left) + 'px';
+                }
+
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                
+                let newTop = element.offsetTop - pos2;
+                let newLeft = element.offsetLeft - pos1;
+                
+                const parent = element.parentElement;
+                
+                if (newTop < 0) newTop = 0;
+                if (newLeft < 0) newLeft = 0;
+                if (newTop + element.clientHeight > parent.clientHeight) {
+                    newTop = parent.clientHeight - element.clientHeight;
+                }
+                if (newLeft + element.clientWidth > parent.clientWidth) {
+                    newLeft = parent.clientWidth - element.clientWidth;
+                }
+
+                element.style.top = newTop + "px";
+                element.style.left = newLeft + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+
+                if (!slideTextStyles[index]) {
+                    slideTextStyles[index] = {};
+                }
+                Object.assign(slideTextStyles[index], {
+                    position: 'absolute',
+                    top: element.style.top,
+                    left: element.style.left
+                });
+            }
+        }
 
     </script>
 </body>
 </html>
-
-
