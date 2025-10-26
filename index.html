@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generatore Prompt Carosello</title>
     <link rel="icon" href="favicon.ico">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+
     <style>
-        /* ...tutto il tuo CSS rimane invariato... */
-        
         /* Stile Globale e Variabili Colore */
         :root {
             --colore-primario: #0146bc; /* Blu */
@@ -51,13 +55,16 @@
 
 
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            /* MODIFICATO: Uso Inter per coerenza, se lo includi */
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
             margin: 0;
             background-color: var(--colore-sfondo);
             color: var(--colore-testo);
             line-height: 1.6;
         }
 
+        /* ...Tutto il resto del CSS fino a .text-overlay-block... */
+        
         /* Contenitore Principale */
         .container {
             max-width: 1200px;
@@ -81,7 +88,7 @@
             text-align: center;
         }
 
-        /* NavigAZIONE Tab */
+        /* Navigazione Tab */
         .tab-nav {
             display: flex;
             border-bottom: 2px solid var(--colore-bordo);
@@ -415,17 +422,18 @@
             letter-spacing: var(--global-letter-spacing);
         }
 
+        /* --- INIZIO CORREZIONE CSS (Interlinea tra blocchi) --- */
         .text-overlay-block h1 {
-            /* JS imposta --local-h1-size (es. 2.5rem) */
-            /* Il default è 2rem se non impostato */
             font-size: calc(var(--local-h1-size, 2rem) * var(--global-font-size-multiplier));
             color: var(--colore-testo-h1);
-            margin: 0 0 1rem 0;
-            line-height: 1.2; /* Line-height locale per h1 */
+            /* margin: 0 0 1rem 0; */
+            margin: 0 0 calc(1rem * var(--global-line-height, 1.6)) 0;
+            line-height: 1.2; 
         }
         .text-overlay-block p {
             font-size: calc(var(--local-p-size, 1.1rem) * var(--global-font-size-multiplier));
-            margin: 0.5rem 0;
+            /* margin: 0.5rem 0; */
+            margin: calc(0.5rem * var(--global-line-height, 1.6)) 0;
             color: var(--colore-testo-p);
         }
         .text-overlay-block strong {
@@ -435,7 +443,8 @@
         .text-overlay-block blockquote {
             border-left: 4px solid var(--colore-blockquote-border);
             padding-left: 1.25rem;
-            margin: 1rem 0;
+            /* margin: 1rem 0; */
+            margin: calc(1rem * var(--global-line-height, 1.6)) 0;
             font-style: italic;
             font-size: calc(var(--local-p-size, 1.1rem) * var(--global-font-size-multiplier)); /* Usa stessa size di P */
             color: var(--colore-blockquote-text);
@@ -445,8 +454,11 @@
             color: var(--colore-testo-small);
             opacity: 0.9;
             display: block;
-            margin-top: 1rem;
+            /* margin-top: 1rem; */
+            margin-top: calc(1rem * var(--global-line-height, 1.6));
         }
+        /* --- FINE CORREZIONE CSS --- */
+
 
         /* Sezioni Output Playground (Suggerimenti e Copy) */
         .playground-output-box {
@@ -584,6 +596,63 @@
         /* --- Fine STILI CUSTOM ALERT MODAL --- */
 
 
+        /* --- NUOVI STILI PER MODAL CATTURA --- */
+        .capture-overlay-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Sfondo grigio scuro come richiesto */
+            background-color: #333333; 
+            display: grid;
+            place-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease;
+            cursor: pointer;
+        }
+        .capture-overlay-container.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Questo wrapper ferma il click-to-close */
+        .capture-content-wrapper {
+            cursor: default;
+            /* Definiamo la dimensione della slide qui */
+            height: 85vh; /* Molto grande */
+            width: auto;
+            max-width: 90vw;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        /* Applica lo stile alla slide clonata */
+        .capture-content-wrapper .carousel-slide {
+            /* Forza angoli non arrotondati */
+            border-radius: 0 !important; 
+            /* Forza 100% dell'altezza del wrapper */
+            height: 100%;
+            width: 100%;
+            /* Rimuovi bordi superflui */
+            border: none;
+            box-shadow: none;
+            /* Assicura che overflow non rovini lo screenshot */
+            overflow: hidden; 
+        }
+        .capture-close-info {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #aaa;
+            font-weight: 600;
+            padding: 5px 15px;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 20px;
+        }
+        /* --- FINE STILI MODAL CATTURA --- */
+
+
         /* --- STILI DI STAMPA PER PDF --- */
         @media print {
             body * {
@@ -596,8 +665,8 @@
 
             header, .tab-nav, #tab-generator, 
             .playground-col-controls label, #json-input, 
-            /* RIMOSSO: #btn-export-png */
-            #btn-export-svg, #btn-export-pdf, 
+            /* RIMOSSO SVG, RIMOSSO PNG, AGGIUNTO NUOVO BTN */
+            #btn-capture-slide, #btn-export-pdf, 
             .carousel-nav, #suggerimenti-output, 
             .playground-output-box h3:first-child,
             #btn-upload-bg, #image-uploader,
@@ -865,7 +934,9 @@
 
                     <h3 class="subsection-title">Esporta Viste</h3>
                     <div class="button-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-                        <button class="btn btn-primary" id="btn-export-svg" onclick="exportSlideSVG(this)" style="background-color: #4CAF50; min-width: auto;">Esporta Testo (SVG)</button>
+                        <button class="btn btn-primary" id="btn-capture-slide" onclick="showFullscreenPreview(this)" style="background-color: #4CAF50; min-width: auto;">
+                            📸 Cattura Slide
+                        </button>
                         <button class="btn btn-neutral" id="btn-export-pdf" onclick="exportToPDF(this)">Esporta PDF</button>
                     </div>
                     <div class="playground-output-box" style="margin-top: 2rem;">
@@ -893,12 +964,16 @@
             <button class="btn btn-primary" onclick="hideCustomAlert()">OK</button>
         </div>
     </div>
-
+    
+    <div id="capture-overlay" class="capture-overlay-container">
+        <div id="capture-content" class="capture-content-wrapper">
+            </div>
+        <span class="capture-close-info">Clicca sullo sfondo per chiudere</span>
+    </div>
     <script>
         let currentSlideIndex = 0;
         let totalSlides = 0;
         const scroller = document.getElementById('carousel-scroller');
-        // Rimosso: const playgroundTab = document.getElementById('tab-playground');
         let suggerimentiOutput = document.getElementById('suggerimenti-output');
         
         let slideSuggerimenti = [];
@@ -930,6 +1005,94 @@
             }
         });
         // --- FINE GESTIONE CUSTOM ALERT ---
+
+
+        // --- INIZIO GESTIONE MODAL CATTURA ---
+        const captureOverlay = document.getElementById('capture-overlay');
+        const captureContent = document.getElementById('capture-content');
+
+        // Chiude il modal cliccando sullo sfondo (overlay)
+        captureOverlay.addEventListener('click', () => {
+            captureOverlay.classList.remove('visible');
+            captureContent.innerHTML = ''; // Svuota il contenuto
+        });
+
+        // Ferma la propagazione del click se si clicca sulla slide
+        captureContent.addEventListener('click', (e) => e.stopPropagation());
+        
+        // --- INIZIO CORREZIONE JS (Anteprima non uguale) ---
+        // Funzione per mostrare il popup di cattura
+        function showFullscreenPreview(button) {
+            if (totalSlides === 0) {
+                showButtonFeedback(button, 'Nessuna slide');
+                return;
+            }
+            showButtonFeedback(button, 'Apro preview...');
+
+            // 1. Trova slide originale
+            const allSlides = scroller.querySelectorAll('.carousel-slide');
+            const currentSlideElement = allSlides[currentSlideIndex];
+            if (!currentSlideElement) return;
+            
+            // 2. Clona la slide
+            const slideClone = currentSlideElement.cloneNode(true);
+
+            // 3. Trova il blocco di testo (originale e clonato)
+            const originalTextBlock = currentSlideElement.querySelector('.text-overlay-block');
+            const clonedTextBlock = slideClone.querySelector('.text-overlay-block');
+            
+            // 4. Disabilita editing sul clone per lo screenshot
+            clonedTextBlock.removeAttribute('contenteditable');
+            clonedTextBlock.style.cursor = 'default';
+            clonedTextBlock.style.outline = 'none';
+
+            // 5. APPLICA STILI COMPUTATI (Garantisce fedeltà 1:1)
+            // Questo risolve i problemi di spaziatura e POSIZIONE
+            if (originalTextBlock) {
+                const originalStyles = window.getComputedStyle(originalTextBlock);
+                clonedTextBlock.style.letterSpacing = originalStyles.letterSpacing;
+                clonedTextBlock.style.wordSpacing = originalStyles.wordSpacing;
+                clonedTextBlock.style.lineHeight = originalStyles.lineHeight;
+
+                // CORREZIONE: Copia la posizione (se modificata col drag)
+                clonedTextBlock.style.position = originalStyles.position;
+                clonedTextBlock.style.top = originalStyles.top;
+                clonedTextBlock.style.left = originalStyles.left;
+                
+                const selector = 'h1, p, small, strong, blockquote';
+                const originalElements = originalTextBlock.querySelectorAll(selector);
+                const clonedElements = clonedTextBlock.querySelectorAll(selector);
+
+                // Applica stili computati da OGNI originale al SUO clone
+                clonedElements.forEach((el, i) => {
+                    const orig = originalElements[i];
+                    if (orig) {
+                        const st = window.getComputedStyle(orig);
+                        el.style.letterSpacing = st.letterSpacing;
+                        el.style.wordSpacing = st.wordSpacing;
+                        el.style.lineHeight = st.lineHeight;
+                        el.style.fontSize = st.fontSize;
+                        el.style.fontFamily = st.fontFamily;
+                        el.style.fontWeight = st.fontWeight;
+                        el.style.color = st.color;
+                        
+                        // CORREZIONE: Copia margini e padding
+                        // (Fondamentale per la Correzione 2)
+                        el.style.margin = st.margin;
+                        el.style.padding = st.padding; 
+                        el.style.borderLeft = st.borderLeft; // Per blockquote
+                    }
+                });
+            }
+
+            // 6. Inserisci il clone nel modal e mostralo
+            captureContent.innerHTML = ''; // Pulisci
+            captureContent.appendChild(slideClone);
+            
+            captureOverlay.classList.add('visible');
+        }
+        // --- FINE CORREZIONE JS ---
+        // --- FINE GESTIONE MODAL CATTURA ---
 
 
         // Listener per salvare le modifiche ai suggerimenti
@@ -1245,8 +1408,6 @@ Esempio di struttura JSON:
 
         // --- NUOVE FUNZIONI STILE ---
 
-        // (Rimossa) function toggleTheme(isNegativo) { ... }
-
         function updateGlobalStyleValue(elementId, value, suffix) {
             let displayValue = parseFloat(value).toFixed(suffix === 'x' ? 2 : 1);
             document.getElementById(elementId).textContent = displayValue + suffix;
@@ -1346,133 +1507,8 @@ Esempio di struttura JSON:
                 updateCarouselState();
             }
         });
-
-        // *** INIZIO MODIFICA JS - PNG RIMOSSO ***
         
-        // Funzione 'exportSlidePNG' rimossa
-        
-        // *** FINE MODIFICA JS - PNG RIMOSSO ***
-        
-        
-        // --- INIZIO CORREZIONE SVG (FONT UNIVERSALI) ---
-        function exportSlideSVG(button) {
-            if (totalSlides === 0) {
-                showButtonFeedback(button, 'Nessuna slide');
-                return;
-            }
-            showButtonFeedback(button, 'Esporta SVG...');
-
-            const allSlides = scroller.querySelectorAll('.carousel-slide');
-            const currentSlideElement = allSlides[currentSlideIndex];
-            const textBlock = currentSlideElement.querySelector('.text-overlay-block');
-
-            // 1. Get dimensioni
-            const slideRect = currentSlideElement.getBoundingClientRect();
-            const width = slideRect.width;
-            const height = slideRect.height; 
-
-            // 2. Get stato
-            const isNegativo = currentSlideElement.classList.contains('theme-negativo');
-
-            // 3. RISOLVI GLI STILI (con font universali)
-            let resolvedStyleBlock = '';
-            const selector = 'h1, p, small, strong, blockquote';
-            const elements = textBlock.querySelectorAll(selector);
-            const styleMap = new Map();
-            const universalFontStack = 'Arial, Helvetica, sans-serif'; // FONT UNIVERSALE
-
-            // Funzione helper per processare gli elementi
-            const processElement = (el) => {
-                if (!el) return;
-                const tagName = el.tagName.toLowerCase();
-                if (styleMap.has(tagName)) return; // Già processato
-                
-                const st = window.getComputedStyle(el);
-                styleMap.set(tagName, `
-        ${tagName} { 
-            font-family: ${universalFontStack}; /* MODIFICA: Font universale */
-            font-size: ${st.fontSize}; 
-            font-weight: ${st.fontWeight};
-            font-style: ${st.fontStyle};
-            fill: ${st.color};  /* 'fill' per SVG */
-            color: ${st.color}; /* 'color' per HTML */
-            letter-spacing: ${st.letterSpacing};
-            word-spacing: ${st.wordSpacing};
-            line-height: ${st.lineHeight};
-            margin: ${st.margin};
-            padding: ${st.padding};
-            display: ${st.display}; /* 'small' è display:block */
-            opacity: ${st.opacity};
-            /* Per blockquote */
-            border-left: ${st.borderLeft};
-            padding-left: ${st.paddingLeft};
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }`);
-            };
-
-            // Processa gli elementi trovati
-            elements.forEach(processElement);
-            // Assicurati che i tag principali siano presenti
-            if (!styleMap.has('h1')) processElement(textBlock.querySelector('h1') || document.createElement('h1'));
-            if (!styleMap.has('p')) processElement(textBlock.querySelector('p') || document.createElement('p'));
-            if (!styleMap.has('small')) processElement(textBlock.querySelector('small') || document.createElement('small'));
-            
-            styleMap.forEach(style => (resolvedStyleBlock += style));
-
-            // Aggiungi lo stile del contenitore .text-overlay-block
-            const textBlockStyles = window.getComputedStyle(textBlock);
-            resolvedStyleBlock += `
-        .text-overlay-block {
-            font-family: ${universalFontStack}; /* MODIFICA: Font universale */
-            box-sizing: border-box;
-            width: 90%; 
-            max-width: 90%;
-            padding: 0.5rem;
-            margin: 0;
-            line-height: ${textBlockStyles.lineHeight};
-            letter-spacing: ${textBlockStyles.letterSpacing};
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }`;
-
-            // 4. Get HTML content
-            let cleanHtml = textBlock.innerHTML.replace(/\u00A0/g, " ");
-            
-            // 5. Get stili inline (per posizione T/L)
-            const textBlockInlineStyles = textBlock.style.cssText;
-
-            // 6. Crea SVG (con dichiarazioni XML e stili risolti)
-            const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-     width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-    
-    <style>
-        ${resolvedStyleBlock}
-    </style>
-    
-    <foreignObject width="100%" height="100%" style="${textBlockInlineStyles}">
-        <div xmlns="http://www.w3.org/1999/xhtml" class="text-overlay-block ${isNegativo ? 'theme-negativo' : ''}">
-            ${cleanHtml}
-        </div>
-    </foreignObject>
-</svg>`;
-            
-            // 7. Create download (usando un Blob per maggior robustezza)
-            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", url);
-            downloadAnchorNode.setAttribute("download", `slide_testo_${currentSlideIndex + 1}.svg`);
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            document.body.removeChild(downloadAnchorNode);
-            URL.revokeObjectURL(url); // Libera memoria
-            
-            showButtonFeedback(button, 'Esporta Testo (SVG)');
-        }
-        // --- FINE CORREZIONE SVG ---
+        // *** FUNZIONE SVG E PNG RIMOSSE ***
 
 
         function exportToPDF(button) {
@@ -1692,4 +1728,3 @@ Esempio di struttura JSON:
     </script>
 </body>
 </html>
-
