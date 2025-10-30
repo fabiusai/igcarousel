@@ -320,25 +320,43 @@
 
         @media (min-width: 1024px) {
             .playground-grid {
-                /* (Carousel + Suggerimenti) | (JSON Input + Controlli) */
-                grid-template-columns: minmax(350px, 450px) 1fr;
+                /* (Carousel) | (Controlli) */
+                /* Modificato: Preview a sx (larga), Controlli a dx (fissi) */
+                grid-template-columns: 1fr minmax(400px, 450px);
             }
         }
         
         .playground-col-preview {
-            max-width: 450px;
-            margin: 0 auto;
+            /* Rimossi max-width e margin */
             width: 100%;
         }
+
+        /* --- INIZIO MODIFICHE UI PREVIEW --- */
+        .preview-area-wrapper {
+            background-color: #333; /* Sfondo omogeneo scuro */
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            /* Altezza minima per contenere la slide 4:5 */
+            min-height: 700px; 
+        }
+
 
         /* Stile Carousel Preview */
         .carousel-preview-container {
             position: relative;
             width: 100%;
-            border: 1px solid var(--colore-bordo);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            /* Dimensione fissa per screenshot di qualità */
+            max-width: 500px; 
+            margin: 0;
+            
+            /* Rimossi bordi, radius e shadow */
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
         }
         
         .carousel-scroller {
@@ -353,6 +371,9 @@
             --global-font-size-multiplier: 1;
             --global-line-height: 1.6;
             --global-letter-spacing: 0px;
+
+            /* Assicura che lo scroller non abbia bordi arrotondati */
+            border-radius: 0;
         }
 
         .carousel-slide {
@@ -367,12 +388,15 @@
             flex-direction: column;
             justify-content: center;
             overflow: auto; 
-            border-right: 1px solid var(--colore-bordo);
             
             position: relative; 
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
+            
+            /* Rimossi bordi e radius */
+            border-right: none;
+            border-radius: 0;
         }
                 
         .carousel-slide:last-child {
@@ -382,10 +406,23 @@
         .carousel-nav {
             display: flex;
             justify-content: space-between;
-            padding: 0.75rem 1rem;
-            background-color: var(--colore-neutro-chiaro);
-            border-top: 1px solid var(--colore-bordo);
+            
+            /* Spostato fuori dal container, su sfondo scuro */
+            background-color: transparent;
+            border-top: none;
+            padding: 1rem 0;
+            width: 100%;
+            max-width: 500px; /* Allineato al carousel */
         }
+        
+        /* Stile Pager su sfondo scuro */
+        #carousel-pager {
+            align-self: center; 
+            color: var(--colore-testo-chiaro); /* Testo bianco */
+            font-weight: 600;
+        }
+        /* --- FINE MODIFICHE UI PREVIEW --- */
+
 
         .carousel-nav-btn {
             background: var(--colore-primario);
@@ -596,61 +633,7 @@
         /* --- Fine STILI CUSTOM ALERT MODAL --- */
 
 
-        /* --- NUOVI STILI PER MODAL CATTURA --- */
-        .capture-overlay-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* Sfondo grigio scuro come richiesto */
-            background-color: #333333; 
-            display: grid;
-            place-items: center;
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s ease;
-            cursor: pointer;
-        }
-        .capture-overlay-container.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-        /* Questo wrapper ferma il click-to-close */
-        .capture-content-wrapper {
-            cursor: default;
-            /* Definiamo la dimensione della slide qui */
-            height: 85vh; /* Molto grande */
-            width: auto;
-            max-width: 90vw;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        /* Applica lo stile alla slide clonata */
-        .capture-content-wrapper .carousel-slide {
-            /* Forza angoli non arrotondati */
-            border-radius: 0 !important; 
-            /* Forza 100% dell'altezza del wrapper */
-            height: 100%;
-            width: 100%;
-            /* Rimuovi bordi superflui */
-            border: none;
-            box-shadow: none;
-            /* Assicura che overflow non rovini lo screenshot */
-            overflow: hidden; 
-        }
-        .capture-close-info {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #aaa;
-            font-weight: 600;
-            padding: 5px 15px;
-            background-color: rgba(0,0,0,0.3);
-            border-radius: 20px;
-        }
-        /* --- FINE STILI MODAL CATTURA --- */
+        /* --- STILI MODAL CATTURA RIMOSSI --- */
 
 
         /* --- STILI DI STAMPA PER PDF --- */
@@ -665,8 +648,8 @@
 
             header, .tab-nav, #tab-generator, 
             .playground-col-controls label, #json-input, 
-            /* RIMOSSO SVG, RIMOSSO PNG, AGGIUNTO NUOVO BTN */
-            #btn-capture-slide, #btn-export-pdf, 
+            /* RIMOSSO SVG, RIMOSSO PNG, RIMOSSO BTN CATTURA */
+            #btn-export-pdf, 
             .carousel-nav, #suggerimenti-output, 
             .playground-output-box h3:first-child,
             #btn-upload-bg, #image-uploader,
@@ -676,7 +659,8 @@
             .global-style-grid, /* Nasconde griglia stili globali */
             #btn-apply-styles, /* Nasconde nuovo bottone locali */
             #btn-apply-global-styles, /* Nasconde bottone globali */
-            #local-theme-toggle-group /* Nasconde tema locale */
+            #local-theme-toggle-group, /* Nasconde tema locale */
+            .preview-area-wrapper /* Nasconde wrapper scuro */
             {
                 display: none !important;
             }
@@ -727,7 +711,7 @@
             .text-overlay-block {
                 position: relative !important; 
                 top: auto !important;
-                left: auto !important;
+                left: auto !importan.carousel-preview-containert;
                 width: 100% !important;
             }
             /* Forza stili leggibili per la stampa (ignora tema) */
@@ -836,38 +820,23 @@
                 <div class="playground-col-preview" id="playground-export-area">
                     <h2 class="section-title">Anteprima Carosello</h2>
                     
-                    <div class="carousel-preview-container">
-                        <div class="carousel-scroller" id="carousel-scroller">
-                            <div class="carousel-slide" style="background-color: #eee; align-items: center; text-align: center; color: #888;">
-                                <p>Incolla il JSON e clicca "Visualizza Anteprima" per generare le slide.</p>
+                    <div class="preview-area-wrapper">
+                        
+                        <div class="carousel-preview-container">
+                            <div class="carousel-scroller" id="carousel-scroller">
+                                <div class="carousel-slide" style="background-color: #eee; align-items: center; text-align: center; color: #888;">
+                                    <p>Incolla il JSON e clicca "Visualizza Anteprima" per generare le slide.</p>
+                                </div>
                             </div>
                         </div>
 
                         <div class="carousel-nav">
                             <button class="carousel-nav-btn" id="carousel-prev" onclick="scrollCarousel(-1)" disabled>&larr;</button>
-                            <span id="carousel-pager" style="align-self: center; color: var(--colore-neutro-scuro); font-weight: 600;">Slide 0 / 0</span>
+                            <span id="carousel-pager">Slide 0 / 0</span>
                             <button class="carousel-nav-btn" id="carousel-next" onclick="scrollCarousel(1)" disabled>&rarr;</button>
                         </div>
-                    </div>
 
-                    <div class="playground-output-box">
-                        <h3>Suggerimenti Visual (Modificabile)</h3>
-                        <div class="playground-output-content" id="suggerimenti-output" contenteditable="true">
-                            <p style="color: #888;">I suggerimenti per l'immagine della slide corrente appariranno qui...</p>
-                        </div>
-                    </div>
-
-                    <input type="file" id="image-uploader" accept="image/*" style="display: none;" onchange="applyBackgroundImage(event)">
-                    
-                    <div class="button-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem;">
-                        <button class="btn btn-neutral" id="btn-upload-bg" onclick="triggerImageUpload(this)">
-                            Carica Sfondo
-                        </button>
-                        <button class="btn btn-neutral" id="btn-copy-all-text" onclick="copyAllSlideText(this)">
-                            Copia Testi Slide
-                        </button>
-                    </div>
-                </div>
+                    </div> </div>
 
                 <div class="playground-col-controls">
                     <h2 class="section-title">Dati Anteprima</h2>
@@ -886,7 +855,16 @@
                         <button class="btn btn-neutral" id="btn-import-json" onclick="triggerImportJSON(this)">Importa JSON</button>
                         <button class="btn btn-neutral" id="btn-export-json" onclick="exportJSON(this)" style="grid-column: 1 / -1;">Esporta JSON con modifiche</button>
                     </div>
-                    
+
+                    <input type="file" id="image-uploader" accept="image/*" style="display: none;" onchange="applyBackgroundImage(event)">
+                    <div class="button-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem;">
+                        <button class="btn btn-neutral" id="btn-upload-bg" onclick="triggerImageUpload(this)">
+                            Carica Sfondo
+                        </button>
+                        <button class="btn btn-neutral" id="btn-copy-all-text" onclick="copyAllSlideText(this)">
+                            Copia Testi Slide
+                        </button>
+                    </div>
                     <h3 class="subsection-title">Stile Globale (Tutte le Slide)</h3>
 
                     <div class="global-style-grid">
@@ -933,11 +911,15 @@
 
 
                     <h3 class="subsection-title">Esporta Viste</h3>
-                    <div class="button-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-                        <button class="btn btn-primary" id="btn-capture-slide" onclick="showFullscreenPreview(this)" style="background-color: #4CAF50; min-width: auto;">
-                            📸 Cattura Slide
-                        </button>
-                        <button class="btn btn-neutral" id="btn-export-pdf" onclick="exportToPDF(this)">Esporta PDF</button>
+                    <div class="button-grid" style="display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                        <button class="btn btn-neutral" id="btn-export-pdf" onclick="exportToPDF(this)">Esporta PDF Riepilogo</button>
+                    </div>
+
+                    <div class="playground-output-box">
+                        <h3>Suggerimenti Visual (Modificabile)</h3>
+                        <div class="playground-output-content" id="suggerimenti-output" contenteditable="true">
+                            <p style="color: #888;">I suggerimenti per l'immagine della slide corrente appariranno qui...</p>
+                        </div>
                     </div>
                     <div class="playground-output-box" style="margin-top: 2rem;">
                         <h3>Copy del Post (Modificabile)</h3>
@@ -952,8 +934,7 @@
                             </div>
                     </div>
                 </div>
-
-            </div>
+                </div>
         </div>
 
     </div>
@@ -965,11 +946,6 @@
         </div>
     </div>
     
-    <div id="capture-overlay" class="capture-overlay-container">
-        <div id="capture-content" class="capture-content-wrapper">
-            </div>
-        <span class="capture-close-info">Clicca sullo sfondo per chiudere</span>
-    </div>
     <script>
         let currentSlideIndex = 0;
         let totalSlides = 0;
@@ -1007,92 +983,7 @@
         // --- FINE GESTIONE CUSTOM ALERT ---
 
 
-        // --- INIZIO GESTIONE MODAL CATTURA ---
-        const captureOverlay = document.getElementById('capture-overlay');
-        const captureContent = document.getElementById('capture-content');
-
-        // Chiude il modal cliccando sullo sfondo (overlay)
-        captureOverlay.addEventListener('click', () => {
-            captureOverlay.classList.remove('visible');
-            captureContent.innerHTML = ''; // Svuota il contenuto
-        });
-
-        // Ferma la propagazione del click se si clicca sulla slide
-        captureContent.addEventListener('click', (e) => e.stopPropagation());
-        
-        // --- INIZIO CORREZIONE JS (Anteprima non uguale) ---
-        // Funzione per mostrare il popup di cattura
-        function showFullscreenPreview(button) {
-            if (totalSlides === 0) {
-                showButtonFeedback(button, 'Nessuna slide');
-                return;
-            }
-            showButtonFeedback(button, 'Apro preview...');
-
-            // 1. Trova slide originale
-            const allSlides = scroller.querySelectorAll('.carousel-slide');
-            const currentSlideElement = allSlides[currentSlideIndex];
-            if (!currentSlideElement) return;
-            
-            // 2. Clona la slide
-            const slideClone = currentSlideElement.cloneNode(true);
-
-            // 3. Trova il blocco di testo (originale e clonato)
-            const originalTextBlock = currentSlideElement.querySelector('.text-overlay-block');
-            const clonedTextBlock = slideClone.querySelector('.text-overlay-block');
-            
-            // 4. Disabilita editing sul clone per lo screenshot
-            clonedTextBlock.removeAttribute('contenteditable');
-            clonedTextBlock.style.cursor = 'default';
-            clonedTextBlock.style.outline = 'none';
-
-            // 5. APPLICA STILI COMPUTATI (Garantisce fedeltà 1:1)
-            // Questo risolve i problemi di spaziatura e POSIZIONE
-            if (originalTextBlock) {
-                const originalStyles = window.getComputedStyle(originalTextBlock);
-                clonedTextBlock.style.letterSpacing = originalStyles.letterSpacing;
-                clonedTextBlock.style.wordSpacing = originalStyles.wordSpacing;
-                clonedTextBlock.style.lineHeight = originalStyles.lineHeight;
-
-                // CORREZIONE: Copia la posizione (se modificata col drag)
-                clonedTextBlock.style.position = originalStyles.position;
-                clonedTextBlock.style.top = originalStyles.top;
-                clonedTextBlock.style.left = originalStyles.left;
-                
-                const selector = 'h1, p, small, strong, blockquote';
-                const originalElements = originalTextBlock.querySelectorAll(selector);
-                const clonedElements = clonedTextBlock.querySelectorAll(selector);
-
-                // Applica stili computati da OGNI originale al SUO clone
-                clonedElements.forEach((el, i) => {
-                    const orig = originalElements[i];
-                    if (orig) {
-                        const st = window.getComputedStyle(orig);
-                        el.style.letterSpacing = st.letterSpacing;
-                        el.style.wordSpacing = st.wordSpacing;
-                        el.style.lineHeight = st.lineHeight;
-                        el.style.fontSize = st.fontSize;
-                        el.style.fontFamily = st.fontFamily;
-                        el.style.fontWeight = st.fontWeight;
-                        el.style.color = st.color;
-                        
-                        // CORREZIONE: Copia margini e padding
-                        // (Fondamentale per la Correzione 2)
-                        el.style.margin = st.margin;
-                        el.style.padding = st.padding; 
-                        el.style.borderLeft = st.borderLeft; // Per blockquote
-                    }
-                });
-            }
-
-            // 6. Inserisci il clone nel modal e mostralo
-            captureContent.innerHTML = ''; // Pulisci
-            captureContent.appendChild(slideClone);
-            
-            captureOverlay.classList.add('visible');
-        }
-        // --- FINE CORREZIONE JS ---
-        // --- FINE GESTIONE MODAL CATTURA ---
+        // --- GESTIONE MODAL CATTURA RIMOSSA ---
 
 
         // Listener per salvare le modifiche ai suggerimenti
