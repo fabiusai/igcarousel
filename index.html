@@ -23,47 +23,22 @@
             --colore-neutro-chiaro: #f9f9f9;
             --colore-neutro-scuro: #555;
             --colore-errore: #d93025;
-
-            /* --- NUOVE VARIABILI TEMA TESTO --- */
-            /* Questi sono i default per il Tema Standard */
-            --colore-testo-h1: var(--colore-primario);
-            --colore-testo-p: var(--colore-testo);
-            --colore-testo-small: var(--colore-neutro-scuro);
-            --colore-testo-strong: var(--colore-primario);
-            --colore-blockquote-border: var(--colore-secondario);
-            --colore-blockquote-text: var(--colore-neutro-scuro);
+            
+            /* NUOVA var Grigio Scuro per Sfondi/Testi */
+            --colore-grigio-scuro: #222;
         }
 
-        /* --- STILI TEMA NEGATIVO (PER SLIDE) --- */
-        /* Questa classe viene aggiunta a .carousel-slide */
-        .carousel-slide.theme-negativo {
-            /* Sfondo scuro per leggibilità */
-            background-color: #222; 
-            
-            /* Blu -> Giallo */
-            --colore-testo-h1: var(--colore-secondario);
-            --colore-testo-strong: var(--colore-secondario);
-            
-            /* Nero/Grigio -> Bianco */
-            --colore-testo-p: var(--colore-testo-chiaro);
-            --colore-testo-small: var(--colore-testo-chiaro);
-            --colore-blockquote-text: var(--colore-testo-chiaro);
-
-            /* Giallo -> Blu */
-            --colore-blockquote-border: var(--colore-primario);
-        }
+        /* --- STILI TEMA RIMOSSI --- */
+        /* La stilizzazione ora è granulare e applicata via JS */
 
 
         body {
-            /* MODIFICATO: Uso Inter per coerenza, se lo includi */
             font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
             margin: 0;
             background-color: var(--colore-sfondo);
             color: var(--colore-testo);
             line-height: 1.6;
         }
-
-        /* ...Tutto il resto del CSS fino a .text-overlay-block... */
         
         /* Contenitore Principale */
         .container {
@@ -164,6 +139,7 @@
         input[type="text"],
         input[type="number"], 
         input[type="range"],
+        select,
         textarea {
             width: 100%;
             padding: 0.85rem;
@@ -172,6 +148,7 @@
             border-radius: 8px;
             box-sizing: border-box; 
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #fff; /* Aggiunto per coerenza select */
         }
         
         input[type="range"] {
@@ -181,6 +158,7 @@
         input[type="text"]:focus,
         input[type="number"]:focus, 
         input[type="range"]:focus,
+        select:focus,
         textarea:focus {
             outline: none;
             border-color: var(--colore-primario);
@@ -320,14 +298,11 @@
 
         @media (min-width: 1024px) {
             .playground-grid {
-                /* (Carousel) | (Controlli) */
-                /* Modificato: Preview a sx (larga), Controlli a dx (fissi) */
                 grid-template-columns: 1fr minmax(400px, 450px);
             }
         }
         
         .playground-col-preview {
-            /* Rimossi max-width e margin */
             width: 100%;
         }
 
@@ -340,7 +315,6 @@
             align-items: center;
             justify-content: center;
             border-radius: 8px;
-            /* Altezza minima per contenere la slide 4:5 */
             min-height: 700px; 
         }
 
@@ -349,11 +323,8 @@
         .carousel-preview-container {
             position: relative;
             width: 100%;
-            /* Dimensione fissa per screenshot di qualità */
             max-width: 500px; 
             margin: 0;
-            
-            /* Rimossi bordi, radius e shadow */
             border: none;
             border-radius: 0;
             box-shadow: none;
@@ -367,12 +338,10 @@
             -webkit-overflow-scrolling: touch; 
             
             /* --- VARIABILI GLOBALI TESTO --- */
-            /* Queste vengono modificate da JS */
             --global-font-size-multiplier: 1;
             --global-line-height: 1.6;
             --global-letter-spacing: 0px;
 
-            /* Assicura che lo scroller non abbia bordi arrotondati */
             border-radius: 0;
         }
 
@@ -383,20 +352,31 @@
             scroll-snap-align: start;
             padding: 1.75rem;
             box-sizing: border-box;
-            background: var(--colore-testo-chiaro);
+            
+            /* Default, ma controllato da JS via applyLayout() */
             display: flex;
             flex-direction: column;
             justify-content: center;
-            overflow: auto; 
+            align-items: center;
             
+            overflow: auto; 
             position: relative; 
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
             
-            /* Rimossi bordi e radius */
             border-right: none;
             border-radius: 0;
+            
+            /* Colori di default, ora sovrascritti da JS */
+            background-color: var(--colore-testo-chiaro); 
+            /* Variabili colore testo (saranno nel text-overlay-block) */
+            --colore-testo-h1: var(--colore-primario);
+            --colore-testo-p: var(--colore-testo);
+            --colore-testo-small: var(--colore-neutro-scuro);
+            --colore-testo-strong: var(--colore-primario);
+            --colore-blockquote-border: var(--colore-secondario);
+            --colore-blockquote-text: var(--colore-neutro-scuro);
         }
                 
         .carousel-slide:last-child {
@@ -406,8 +386,6 @@
         .carousel-nav {
             display: flex;
             justify-content: space-between;
-            
-            /* Spostato fuori dal container, su sfondo scuro */
             background-color: transparent;
             border-top: none;
             padding: 1rem 0;
@@ -415,7 +393,6 @@
             max-width: 500px; /* Allineato al carousel */
         }
         
-        /* Stile Pager su sfondo scuro */
         #carousel-pager {
             align-self: center; 
             color: var(--colore-testo-chiaro); /* Testo bianco */
@@ -447,9 +424,6 @@
 
         /* Stile Testi Slide (ora usa VARIABILI) */
         .text-overlay-block {
-            position: relative; 
-            cursor: move;
-            z-index: 10;
             width: 90%; 
             max-width: 90%; 
             box-sizing: border-box;
@@ -459,17 +433,16 @@
             letter-spacing: var(--global-letter-spacing);
         }
 
-        /* --- INIZIO CORREZIONE CSS (Interlinea tra blocchi) --- */
+        /* --- INIZIO CORREZIONE CSS --- */
         .text-overlay-block h1 {
             font-size: calc(var(--local-h1-size, 2rem) * var(--global-font-size-multiplier));
             color: var(--colore-testo-h1);
-            /* margin: 0 0 1rem 0; */
             margin: 0 0 calc(1rem * var(--global-line-height, 1.6)) 0;
-            line-height: 1.2; 
+            /* MODIFICA: Forzato il line-height per essere controllato dallo slider */
+            line-height: var(--global-line-height);
         }
         .text-overlay-block p {
             font-size: calc(var(--local-p-size, 1.1rem) * var(--global-font-size-multiplier));
-            /* margin: 0.5rem 0; */
             margin: calc(0.5rem * var(--global-line-height, 1.6)) 0;
             color: var(--colore-testo-p);
         }
@@ -480,18 +453,38 @@
         .text-overlay-block blockquote {
             border-left: 4px solid var(--colore-blockquote-border);
             padding-left: 1.25rem;
-            /* margin: 1rem 0; */
             margin: calc(1rem * var(--global-line-height, 1.6)) 0;
             font-style: italic;
             font-size: calc(var(--local-p-size, 1.1rem) * var(--global-font-size-multiplier)); /* Usa stessa size di P */
             color: var(--colore-blockquote-text);
         }
+        
+        /* --- NUOVO CSS PER FOOTER CITAZIONI --- */
+        .text-overlay-block blockquote footer {
+            margin-top: 0.75rem;
+            font-style: normal;
+            font-size: calc(0.9 * var(--local-p-size, 1.1rem) * var(--global-font-size-multiplier)); /* 90% di P */
+            text-align: right;
+            line-height: 1.4; /* Interlinea fissa per footer */
+        }
+        .text-overlay-block blockquote .nome {
+            display: block;
+            font-weight: 700;
+            color: var(--colore-testo-strong); /* Usa il colore strong */
+        }
+        .text-overlay-block blockquote .ruolo {
+            display: block;
+            font-size: 0.9em; /* 90% del footer */
+            opacity: 0.8;
+            color: var(--colore-testo-p); /* Usa il colore p */
+        }
+        /* --- FINE NUOVO CSS --- */
+
         .text-overlay-block small {
             font-size: calc(var(--local-small-size, 0.85rem) * var(--global-font-size-multiplier));
             color: var(--colore-testo-small);
             opacity: 0.9;
             display: block;
-            /* margin-top: 1rem; */
             margin-top: calc(1rem * var(--global-line-height, 1.6));
         }
         /* --- FINE CORREZIONE CSS --- */
@@ -535,20 +528,14 @@
             border-radius: 4px;
         }
 
+        /* Outline modificata per funzionare su sfondi diversi */
         .text-overlay-block[contenteditable="true"]:hover,
         .text-overlay-block[contenteditable="true"]:focus-within {
             outline: 2px dashed var(--colore-primario);
-            background-color: rgba(255, 255, 255, 0.2); 
+            background-color: rgba(0, 0, 0, 0.1); 
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
-        /* Tema negativo outline */
-        .carousel-slide.theme-negativo .text-overlay-block[contenteditable="true"]:hover,
-        .carousel-slide.theme-negativo .text-overlay-block[contenteditable="true"]:focus-within {
-             outline: 2px dashed var(--colore-secondario);
-             background-color: rgba(255, 255, 255, 0.1); 
-        }
-
 
         /* Griglia Stili Granulari (Ora solo Dimensione) */
         .style-grid {
@@ -633,7 +620,94 @@
         /* --- Fine STILI CUSTOM ALERT MODAL --- */
 
 
-        /* --- STILI MODAL CATTURA RIMOSSI --- */
+        /* --- NUOVI STILI PER ACCORDION E LAYOUT --- */
+        .control-group summary {
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--colore-primario);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--colore-bordo);
+            padding-bottom: 0.25rem;
+            user-select: none; /* Impedisce la selezione del testo */
+        }
+
+        .control-group summary:hover {
+            color: #00338a;
+        }
+
+        .control-group > *:not(summary) {
+            margin-left: 0.5rem; /* Indenta leggermente il contenuto */
+            margin-right: 0.5rem;
+        }
+
+        /* Nasconde il marcatore di default e ne mette uno custom */
+        .control-group summary {
+          list-style: none;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .control-group summary::-webkit-details-marker {
+          display: none;
+        }
+        .control-group summary::after {
+          content: '▼';
+          font-size: 0.8rem;
+          transition: transform 0.2s ease;
+        }
+        .control-group[open] summary::after {
+          transform: rotate(180deg);
+        }
+
+        /* Griglia Layout */
+        .layout-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .layout-btn {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 2px solid var(--colore-bordo);
+            border-radius: 8px;
+            background: var(--colore-testo-chiaro);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .layout-btn:hover {
+            background: var(--colore-neutro-chiaro);
+        }
+        .layout-btn.active {
+            background: var(--colore-primario);
+            color: var(--colore-testo-chiaro);
+            border-color: var(--colore-primario);
+        }
+        
+        /* NUOVO: Griglia Colori */
+         .color-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .color-grid label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--colore-neutro-scuro);
+        }
+        .color-grid select {
+            padding: 0.5rem; /* Ridotto */
+            font-size: 0.9rem;
+            background-color: #fff;
+            border: 2px solid var(--colore-bordo);
+        }
+        
+        /* --- FINE NUOVI STILI --- */
 
 
         /* --- STILI DI STAMPA PER PDF --- */
@@ -648,7 +722,6 @@
 
             header, .tab-nav, #tab-generator, 
             .playground-col-controls label, #json-input, 
-            /* RIMOSSO SVG, RIMOSSO PNG, RIMOSSO BTN CATTURA */
             #btn-export-pdf, 
             .carousel-nav, #suggerimenti-output, 
             .playground-output-box h3:first-child,
@@ -659,8 +732,13 @@
             .global-style-grid, /* Nasconde griglia stili globali */
             #btn-apply-styles, /* Nasconde nuovo bottone locali */
             #btn-apply-global-styles, /* Nasconde bottone globali */
-            #local-theme-toggle-group, /* Nasconde tema locale */
-            .preview-area-wrapper /* Nasconde wrapper scuro */
+            .color-grid, /* Nasconde griglia colori */
+            .preview-area-wrapper, /* Nasconde wrapper scuro */
+            
+            /* NASCONDE NUOVI CONTROLLI */
+            .control-group summary, /* Nasconde titoli accordion */
+            .layout-controls, /* Nasconde griglia layout */
+            #btn-add-slide, #btn-delete-slide /* Nasconde bottoni add/remove */
             {
                 display: none !important;
             }
@@ -692,7 +770,7 @@
             }
 
             .carousel-slide {
-                display: block;
+                display: flex !important; /* Forza flex per allineamento stampa */
                 width: 90%; 
                 margin: 0 auto;
                 height: auto;
@@ -706,6 +784,15 @@
                 background-position: center !important;
                 -webkit-print-color-adjust: exact; 
                 print-color-adjust: exact;
+                
+                /* Forza colori di stampa */
+                background-color: #fff !important;
+                --colore-testo-h1: #000 !important;
+                --colore-testo-p: #000 !important;
+                --colore-testo-small: #000 !important;
+                --colore-testo-strong: #000 !important;
+                --colore-blockquote-border: #ccc !important;
+                --colore-blockquote-text: #000 !important;
             }
             
             .text-overlay-block {
@@ -836,98 +923,149 @@
                             <button class="carousel-nav-btn" id="carousel-next" onclick="scrollCarousel(1)" disabled>&rarr;</button>
                         </div>
 
-                    </div> </div>
+                    </div>
+                </div>
 
                 <div class="playground-col-controls">
-                    <h2 class="section-title">Dati Anteprima</h2>
-                    <div class="form-group">
-                        <label for="json-input">Incolla o importa il JSON generato</label>
-                        <textarea id="json-input" rows="10" placeholder="Incolla qui il blocco JSON restituito dall'AI o usa 'Importa JSON'..."></textarea>
-                        <small id="json-error">Errore: Il JSON non è valido o ha una struttura errata.</small>
-                    </div>
-                    
-                    <input type="file" id="json-importer" accept=".json,application/json" style="display: none;" onchange="importJSON(event)">
+                    <h2 class="section-title">Controlli Playground</h2>
 
-                    <h3 class="subsection-title">Azioni Dati</h3>
-                    <div class="button-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-                        <button class="btn btn-primary" id="btn-preview" onclick="renderPreview(this)" style="grid-column: 1 / -1;">Visualizza Anteprima</button>
-                        <button class="btn btn-neutral" id="btn-clear-json" onclick="clearJsonInput(this)">Svuota JSON</button>
-                        <button class="btn btn-neutral" id="btn-import-json" onclick="triggerImportJSON(this)">Importa JSON</button>
-                        <button class="btn btn-neutral" id="btn-export-json" onclick="exportJSON(this)" style="grid-column: 1 / -1;">Esporta JSON con modifiche</button>
-                    </div>
-
-                    <input type="file" id="image-uploader" accept="image/*" style="display: none;" onchange="applyBackgroundImage(event)">
-                    <div class="button-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem;">
-                        <button class="btn btn-neutral" id="btn-upload-bg" onclick="triggerImageUpload(this)">
-                            Carica Sfondo
-                        </button>
-                        <button class="btn btn-neutral" id="btn-copy-all-text" onclick="copyAllSlideText(this)">
-                            Copia Testi Slide
-                        </button>
-                    </div>
-                    <h3 class="subsection-title">Stile Globale (Tutte le Slide)</h3>
-
-                    <div class="global-style-grid">
-                        <label for="global-size-input">Dimensione</label>
-                        <input type="range" id="global-size-input" value="1" min="0.5" max="2" step="0.05" oninput="updateGlobalStyleValue('global-size-value', this.value, 'x')">
-                        <span id="global-size-value">1.00x</span>
-                        
-                        <label for="global-line-height-input">Interlinea</label>
-                        <input type="range" id="global-line-height-input" value="1.6" min="1" max="3" step="0.1" oninput="updateGlobalStyleValue('global-line-height-value', this.value, '')">
-                        <span id="global-line-height-value">1.6</span>
-                        
-                        <label for="global-letter-spacing-input">Spaziatura</label>
-                        <input type="range" id="global-letter-spacing-input" value="0" min="-1" max="5" step="0.1" oninput="updateGlobalStyleValue('global-letter-spacing-value', this.value, 'px')">
-                        <span id="global-letter-spacing-value">0.0px</span>
-                    </div>
-                    <button class="btn btn-secondary" id="btn-apply-global-styles" onclick="applyGlobalStyles(this)" style="width: 100%; margin-top: 0.5rem;">
-                        Applica Stili Globali
-                    </button>
-
-
-                    <h3 class="subsection-title">Stile Locale (Slide Corrente)</h3>
-                    <p style="font-size: 0.9rem; color: #666; margin-top: -0.5rem; margin-bottom: 1rem;">Modifica la dimensione di base e il tema per questa slide.</p>
-                    
-                    <div class="form-group" id="local-theme-toggle-group">
-                        <label class="checkbox-group">
-                            <input type="checkbox" id="local-theme-toggle">
-                            <label for="local-theme-toggle">Attiva Tema Negativo (Testo Chiaro)</label>
-                        </label>
-                    </div>
-
-                    <div class="style-grid">
-                        <label for="h1-size-input">Dimensione Titolo (h1)</label>
-                        <input type="number" id="h1-size-input" value="2" min="0.5" max="5" step="0.1" title="Dimensione in rem">
-                        
-                        <label for="p-size-input">Dimensione Corpo (p)</label>
-                        <input type="number" id="p-size-input" value="1.1" min="0.5" max="3" step="0.1" title="Dimensione in rem">
-                        
-                        <label for="small-size-input">Dimensione Small (small)</label>
-                        <input type="number" id="small-size-input" value="0.85" min="0.5" max="2" step="0.1" title="Dimensione in rem">
-                    </div>
-                    <button class="btn btn-neutral" id="btn-apply-styles" onclick="applyLocalStyles(this)" style="width: 100%; margin-top: 0.5rem;">
-                        Applica Stili Locali
-                    </button>
-
-
-                    <h3 class="subsection-title">Esporta Viste</h3>
-                    <div class="button-grid" style="display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-                        <button class="btn btn-neutral" id="btn-export-pdf" onclick="exportToPDF(this)">Esporta PDF Riepilogo</button>
-                    </div>
-
-                    <div class="playground-output-box">
-                        <h3>Suggerimenti Visual (Modificabile)</h3>
-                        <div class="playground-output-content" id="suggerimenti-output" contenteditable="true">
-                            <p style="color: #888;">I suggerimenti per l'immagine della slide corrente appariranno qui...</p>
+                    <details class="control-group" open>
+                        <summary class="subsection-title">Carica Dati Storyboard (JSON)</summary>
+                        <div class="form-group">
+                            <label for="json-input">Incolla o importa il JSON generato</label>
+                            <textarea id="json-input" rows="8" placeholder="Incolla qui il blocco JSON..."></textarea>
+                            <small id="json-error">Errore: Il JSON non è valido o ha una struttura errata.</small>
                         </div>
-                    </div>
-                    <div class="playground-output-box" style="margin-top: 2rem;">
-                        <h3>Copy del Post (Modificabile)</h3>
-                        <div class="playground-output-content" id="copy-post-output" contenteditable="true">
-                            <p style="color: #888;">Il copy del post generato dall'AI apparirà qui...</p>
-                        </div>
-                    </div>
+                        
+                        <input type="file" id="json-importer" accept=".json,application/json" style="display: none;" onchange="importJSON(event)">
 
+                        <div class="button-grid" style="grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                            <button class="btn btn-primary" id="btn-preview" onclick="renderPreview(this)">Visualizza Anteprima</button>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                 <button class="btn btn-neutral" id="btn-import-json" onclick="triggerImportJSON(this)">Importa JSON</button>
+                                 <button class="btn btn-neutral" id="btn-clear-json" onclick="clearJsonInput(this)">Svuota JSON</button>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="control-group">
+                        <summary class="subsection-title">Stile Globale (Tutte le Slide)</summary>
+                        <div class="global-style-grid">
+                            <label for="global-size-input">Dimensione</label>
+                            <input type="range" id="global-size-input" value="1" min="0.5" max="2" step="0.05" oninput="updateGlobalStyleValue('global-size-value', this.value, 'x')">
+                            <span id="global-size-value">1.00x</span>
+                            
+                            <label for="global-line-height-input">Interlinea</label>
+                            <input type="range" id="global-line-height-input" value="1.6" min="1" max="3" step="0.1" oninput="updateGlobalStyleValue('global-line-height-value', this.value, '')">
+                            <span id="global-line-height-value">1.6</span>
+                            
+                            <label for="global-letter-spacing-input">Spaziatura</label>
+                            <input type="range" id="global-letter-spacing-input" value="0" min="-1" max="5" step="0.1" oninput="updateGlobalStyleValue('global-letter-spacing-value', this.value, 'px')">
+                            <span id="global-letter-spacing-value">0.0px</span>
+                        </div>
+                        <button class="btn btn-secondary" id="btn-apply-global-styles" onclick="applyGlobalStyles(this)" style="width: 100%; margin-top: 0.5rem;">
+                            Applica Stili Globali
+                        </button>
+                    </details>
+
+                    <details class="control-group" open>
+                        <summary class="subsection-title" id="local-slide-title">Modifica Slide Corrente</summary>
+                        
+                        <h4 class="subsection-title" style="font-size: 1rem; margin-top: 0; color: #333;">Allineamento Testo</h4>
+                        <div class="layout-controls">
+                            <button class="layout-btn" data-layout="top-left" title="Alto Sinistra">TL</button>
+                            <button class="layout-btn" data-layout="top-center" title="Alto Centro">TC</button>
+                            <button class="layout-btn" data-layout="top-right" title="Alto Destra">TR</button>
+                            
+                            <button class="layout-btn" data-layout="mid-left" title="Centro Sinistra">CL</button>
+                            <button class="layout-btn active" data-layout="mid-center" title="Centro Centro">CC</button>
+                            <button class="layout-btn" data-layout="mid-right" title="Centro Destra">CR</button>
+                            
+                            <button class="layout-btn" data-layout="bottom-left" title="Basso Sinistra">BL</button>
+                            <button class="layout-btn" data-layout="bottom-center" title="Basso Centro">BC</button>
+                            <button class="layout-btn" data-layout="bottom-right" title="Basso Destra">BR</button>
+                        </div>
+                        
+                        <h4 class="subsection-title" style="font-size: 1rem; margin-top: 1.5rem; color: #333;">Stile Locale Testo</h4>
+                        
+                        <div class="color-grid">
+                            <label for="color-bg-select">Sfondo</label>
+                            <select id="color-bg-select">
+                                <option value="#ffffff">Bianco</option>
+                                <option value="#222222">Grigio Scuro</option>
+                            </select>
+                            
+                            <label for="color-accent-select">Titoli & Strong</label>
+                            <select id="color-accent-select">
+                                <option value="#0146bc">Blu</option>
+                                <option value="#eddc01">Giallo</option>
+                                <option value="#333333">Grigio Scuro</option>
+                                <option value="#ffffff">Bianco</option>
+                            </select>
+                        
+                            <label for="color-text-select">Testo Corpo</label>
+                            <select id="color-text-select">
+                                <option value="#333333">Grigio Scuro</option>
+                                <option value="#ffffff">Bianco</option>
+                            </select>
+                        
+                            <label for="color-border-select">Bordo Quote</label>
+                            <select id="color-border-select">
+                                <option value="#eddc01">Giallo</option>
+                                <option value="#0146bc">Blu</option>
+                            </select>
+                        </div>
+                        <div class="style-grid">
+                            <label for="h1-size-input">Dimensione Titolo (h1)</label>
+                            <input type="number" id="h1-size-input" value="2" min="0.5" max="5" step="0.1" title="Dimensione in rem">
+                            
+                            <label for="p-size-input">Dimensione Corpo (p)</label>
+                            <input type="number" id="p-size-input" value="1.1" min="0.5" max="3" step="0.1" title="Dimensione in rem">
+                            
+                            <label for="small-size-input">Dimensione Small (small)</label>
+                            <input type="number" id="small-size-input" value="0.85" min="0.5" max="2" step="0.1" title="Dimensione in rem">
+                        </div>
+                        <button class="btn btn-neutral" id="btn-apply-styles" onclick="applyLocalStyles(this)" style="width: 100%; margin-top: 0.5rem;">
+                            Applica Stili Locali
+                        </button>
+
+                        <h4 class="subsection-title" style="font-size: 1rem; margin-top: 1.5rem; color: #333;">Sfondo e Azioni Slide</h4>
+                        <input type="file" id="image-uploader" accept="image/*" style="display: none;" onchange="applyBackgroundImage(event)">
+                        <div class="button-grid" style="grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem;">
+                            <button class="btn btn-neutral" id="btn-upload-bg" onclick="triggerImageUpload(this)">
+                                Carica Sfondo
+                            </button>
+                            <button class="btn btn-secondary" id="btn-add-slide" onclick="addNewSlide(this)">+ Aggiungi Slide</button>
+                            <button class="btn btn-danger" id="btn-delete-slide" onclick="deleteCurrentSlide(this)" style="grid-column: 1 / -1; min-width: 0; background-color: #fbeaea; color: var(--colore-errore); border: 2px solid #f8d7da;">
+                                Elimina Slide Corrente
+                            </button>
+                        </div>
+                    </details>
+
+                    <details class="control-group" open>
+                        <summary class="subsection-title">Output e Testi</summary>
+                         <div class="playground-output-box">
+                            <h3>Suggerimenti Visual (Modificabile)</h3>
+                            <div class="playground-output-content" id="suggerimenti-output" contenteditable="true">
+                                <p style="color: #888;">I suggerimenti per l'immagine della slide corrente appariranno qui...</p>
+                            </div>
+                        </div>
+                         <div class="playground-output-box" style="margin-top: 1.5rem;">
+                             <h3>Copy del Post (Modificabile)</h3>
+                            <div class="playground-output-content" id="copy-post-output" contenteditable="true">
+                                <p style="color: #888;">Il copy del post generato dall'AI apparirà qui...</p>
+                            </div>
+                         </div>
+                        <h4 class="subsection-title" style="font-size: 1rem; margin-top: 1.5rem; color: #333;">Esporta</h4>
+                         <div class="button-grid" style="grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                            <button class="btn btn-neutral" id="btn-export-json" onclick="exportJSON(this)">Esporta JSON</button>
+                            <button class="btn btn-neutral" id="btn-export-pdf" onclick="exportToPDF(this)">Esporta PDF</button>
+                            <button class="btn btn-neutral" id="btn-copy-all-text" onclick="copyAllSlideText(this)" style="grid-column: 1 / -1;">
+                                Copia Testi Slide
+                            </button>
+                         </div>
+                    </details>
+                    
                     <div class="playground-output-box" id="riepilogo-suggerimenti-stampa" style="display: none;">
                         <h3>Riepilogo Suggerimenti Visual</h3>
                         <div class="playground-output-content" id="riepilogo-suggerimenti-output">
@@ -954,7 +1092,7 @@
         
         let slideSuggerimenti = [];
         let slideBackgrounds = []; 
-        let slideTextStyles = []; // Conterrà oggetti per { h1: { fontSize }, p: { fontSize }, small: { fontSize }, themeNegativo, position... }
+        let slideTextStyles = []; // Conterrà oggetti per { h1, p, small, colors, layout... }
         
         // Stato globale per stili globali (senza tema)
         let globalTextStyles = {
@@ -962,10 +1100,31 @@
             lineHeight: 1.6,
             letterSpacing: '0px',
         };
+        
+        // Colori di default per le nuove slide
+        const defaultColors = {
+            bg: '#ffffff',
+            accent: '#0146bc',
+            text: '#333333',
+            border: '#eddc01'
+        };
 
         const pager = document.getElementById('carousel-pager');
         const btnPrev = document.getElementById('carousel-prev');
         const btnNext = document.getElementById('carousel-next');
+
+        // Mappa layout globale (per evitare duplicazioni)
+        const layoutMap = {
+            'top-left':    { justifyContent: 'flex-start',  alignItems: 'flex-start' },
+            'top-center':  { justifyContent: 'flex-start',  alignItems: 'center' },
+            'top-right':   { justifyContent: 'flex-start',  alignItems: 'flex-end' },
+            'mid-left':    { justifyContent: 'center',      alignItems: 'flex-start' },
+            'mid-center':  { justifyContent: 'center',      alignItems: 'center' },
+            'mid-right':   { justifyContent: 'center',      alignItems: 'flex-end' },
+            'bottom-left': { justifyContent: 'flex-end',    alignItems: 'flex-start' },
+            'bottom-center':{ justifyContent: 'flex-end',    alignItems: 'center' },
+            'bottom-right':{ justifyContent: 'flex-end',    alignItems: 'flex-end' }
+        };
         
         // --- GESTIONE CUSTOM ALERT ---
         function showCustomAlert(message) {
@@ -980,14 +1139,17 @@
                 hideCustomAlert();
             }
         });
-        // --- FINE GESTIONE CUSTOM ALERT ---
-
-
-        // --- GESTIONE MODAL CATTURA RIMOSSA ---
-
-
+        
         // Listener per salvare le modifiche ai suggerimenti
         suggerimentiOutput.addEventListener('blur', saveSuggerimento);
+        
+        // Listener per bottoni layout
+        document.querySelector('.layout-controls').addEventListener('click', function(e) {
+            if (e.target.classList.contains('layout-btn')) {
+                applyLayout(e.target.dataset.layout);
+            }
+        });
+
 
         // --- GESTIONE TAB ---
         function openTab(event, tabName) {
@@ -1035,7 +1197,7 @@
             const linkInputs = document.querySelectorAll('.link-input');
             const links = Array.from(linkInputs).map(input => input.value).filter(val => val.trim() !== '');
 
-            // Prompt aggiornato
+            // MODIFICA: Prompt aggiornato per includere la struttura blockquote
             const prompt = `
 Sei un esperto social media manager e copywriter specializzato in contenuti informativi per brand istituzionali.
 IL TUO COMPITO:
@@ -1064,11 +1226,11 @@ Ogni oggetto nell'array "slides" DEVE contenere:
     -   '<h1>' per il titolo della slide.
     -   '<p>' per il testo principale.
     -   '<strong>' per evidenziare termini chiave.
-    -   '<blockquote>' per citazioni o dati rilevanti.
+    -   '<blockquote>' per citazioni. La citazione DEVE essere strutturata così: <blockquote><p>Testo della citazione...</p><footer><span class="nome">Nome Cognome</span><span class="ruolo">Ruolo/Azienda</span></footer></blockquote>
     -   '<small>' per note a piè di pagina o testi secondari.
 -   "suggerimento_visual": Una breve descrizione testuale dell'immagine di sfondo.
 -   "background_image": Includi questo campo con valore 'null'.
--   "text_styles": Includi questo campo con valore '{}' (un oggetto vuoto). (Conterrà 'themeNegativo: true/false' dopo la modifica manuale)
+-   "text_styles": Includi questo campo con valore '{}'.
 FORMATO DI OUTPUT OBBLIGATORIO:
 Restituisci ESCLUSIVAMENTE un singolo blocco di codice JSON valido. Non aggiungere spiegazioni prima o dopo il JSON.
 Esempio di struttura JSON:
@@ -1084,7 +1246,7 @@ Esempio di struttura JSON:
       "text_styles": {}
     },
     {
-      "testo_formattato": "<p>Questa è una <strong>parola chiave</strong>.</p><small>Nota a piè di pagina.</small>",
+      "testo_formattato": "<blockquote><p>Questa è una citazione importante.</p><footer><span class="nome">Mario Rossi</span><span class="ruolo">CEO</span></footer></blockquote>",
       "suggerimento_visual": "Icona stilizzata che rappresenta il servizio.",
       "background_image": null,
       "text_styles": {}
@@ -1128,6 +1290,70 @@ Esempio di struttura JSON:
 
         // --- GESTIONE PLAYGROUND ---
 
+        // MODIFICA: Funzione helper per applicare colori granulari
+        function applySlideColors(slideElement, textBlockElement, colors) {
+            const c = { ...defaultColors, ...colors }; // Unisci con i default
+            
+            slideElement.style.backgroundColor = c.bg;
+            textBlockElement.style.setProperty('--colore-testo-h1', c.accent);
+            textBlockElement.style.setProperty('--colore-testo-strong', c.accent);
+            textBlockElement.style.setProperty('--colore-testo-p', c.text);
+            textBlockElement.style.setProperty('--colore-testo-small', c.text);
+            textBlockElement.style.setProperty('--colore-blockquote-text', c.text);
+            textBlockElement.style.setProperty('--colore-blockquote-border', c.border);
+        }
+
+        // MODIFICA: Aggiornata per leggere 'styles.colors'
+        function createSlideElement(slideData) {
+            const slide = document.createElement('div');
+            slide.className = 'carousel-slide';
+            
+            const textContent = document.createElement('div');
+            textContent.className = 'text-overlay-block';
+            textContent.setAttribute('contenteditable', 'true');
+            
+            let cleanHtml = slideData.testo_formattato || '<p>(Testo mancante)</p>';
+            textContent.innerHTML = cleanHtml.replace(/\u00A0/g, " ");
+
+            // Applica stili granulari
+            if (slideData.text_styles) {
+                const styles = slideData.text_styles;
+                
+                if (styles.h1 && styles.h1.fontSize) {
+                    textContent.style.setProperty('--local-h1-size', styles.h1.fontSize);
+                }
+                if (styles.p && styles.p.fontSize) {
+                    textContent.style.setProperty('--local-p-size', styles.p.fontSize);
+                }
+                if (styles.small && styles.small.fontSize) {
+                    textContent.style.setProperty('--local-small-size', styles.small.fontSize);
+                }
+                
+                // Applica layout
+                const layout = styles.layout || 'mid-center';
+                const flexStyles = layoutMap[layout] || layoutMap['mid-center'];
+                slide.style.justifyContent = flexStyles.justifyContent;
+                slide.style.alignItems = flexStyles.alignItems;
+
+                // Applica colori granulari
+                applySlideColors(slide, textContent, styles.colors || defaultColors);
+                
+            } else {
+                 // Default layout e colori
+                slide.style.justifyContent = 'center';
+                slide.style.alignItems = 'center';
+                applySlideColors(slide, textContent, defaultColors);
+            }
+
+            slide.appendChild(textContent);
+
+            if (slideData.background_image) {
+                slide.style.backgroundImage = `url(${slideData.background_image})`;
+            }
+            return slide;
+        }
+
+        // MODIFICA: Rimuove logica 'theme' e 'themeNegativo'
         function renderPreview(button) {
             showButtonFeedback(button, 'Caricamento...');
             let jsonInput = document.getElementById('json-input').value;
@@ -1167,59 +1393,37 @@ Esempio di struttura JSON:
                 if (totalSlides === 0) {
                      throw new Error('Nessuna slide trovata nel JSON.');
                 }
-                
-                slideBackgrounds = new Array(totalSlides).fill(null);
-                slideTextStyles = new Array(totalSlides).fill({}); // Inizializza come oggetti vuoti
 
                 data.slides.forEach((slideData, index) => {
-                    const slide = document.createElement('div');
-                    slide.className = 'carousel-slide';
-                    
-                    const textContent = document.createElement('div');
-                    textContent.className = 'text-overlay-block'; 
-                    textContent.setAttribute('contenteditable', 'true');
-                    
-                    let cleanHtml = slideData.testo_formattato || '<p>(Testo mancante)</p>';
-                    textContent.innerHTML = cleanHtml.replace(/\u00A0/g, " ");
+                    let styles = slideData.text_styles || {};
 
-                    // Applica stili granulari salvati
-                    if (slideData.text_styles) {
-                        const styles = slideData.text_styles;
-                        
-                        if (styles.h1 && styles.h1.fontSize) {
-                            textContent.style.setProperty('--local-h1-size', styles.h1.fontSize);
-                        }
-                        if (styles.p && styles.p.fontSize) {
-                            textContent.style.setProperty('--local-p-size', styles.p.fontSize);
-                        }
-                        if (styles.small && styles.small.fontSize) {
-                            textContent.style.setProperty('--local-small-size', styles.small.fontSize);
-                        }
-                        
-                        // Applica stili di posizionamento
-                        if (styles.position) textContent.style.position = styles.position;
-                        if (styles.top) textContent.style.top = styles.top;
-                        if (styles.left) textContent.style.left = styles.left;
-
-                        // Applica tema locale
-                        if (styles.themeNegativo) {
-                            slide.classList.add('theme-negativo');
-                        }
-
-                        // Salva l'intero oggetto stile
-                        slideTextStyles[index] = { ...styles };
+                    // TRANCODIFICA per compatibilità vecchi JSON
+                    if (styles.theme === 'grigio-blu' || styles.themeNegativo === true) {
+                        styles.colors = {
+                            bg: '#222222',
+                            accent: '#0146bc',
+                            text: '#ffffff',
+                            border: '#0146bc'
+                        };
+                    } else if (styles.theme === 'bianco-giallo') {
+                         styles.colors = {
+                            bg: '#ffffff',
+                            accent: '#eddc01',
+                            text: '#333333',
+                            border: '#eddc01'
+                        };
                     }
-
-                    slide.appendChild(textContent);
-                    makeDraggable(textContent, index); 
-
-                    if (slideData.background_image) {
-                        slide.style.backgroundImage = `url(${slideData.background_image})`;
-                        slideBackgrounds[index] = slideData.background_image; 
-                    }
+                    delete styles.theme;
+                    delete styles.themeNegativo;
                     
-                    scroller.appendChild(slide);
+                    // Salva i dati negli array di stato
+                    slideTextStyles[index] = styles;
+                    slideBackgrounds[index] = slideData.background_image || null;
                     slideSuggerimenti.push(slideData.suggerimento_visual || '(Nessun suggerimento)');
+                    
+                    // Crea e aggiungi l'elemento slide (passando gli stili aggiornati)
+                    const slideElement = createSlideElement({ ...slideData, text_styles: styles });
+                    scroller.appendChild(slideElement);
                 });
 
                 currentSlideIndex = 0;
@@ -1259,11 +1463,14 @@ Esempio di struttura JSON:
             riepilogoContainer.innerHTML = html;
         }
 
-        // Aggiorna i soli input locali
+        // MODIFICA: Aggiornato per leggere/scrivere sui <select> del colore
         function updateCarouselState() {
             pager.textContent = `Slide ${currentSlideIndex + 1} / ${totalSlides}`;
             btnPrev.disabled = (currentSlideIndex === 0);
             btnNext.disabled = (currentSlideIndex === totalSlides - 1 || totalSlides === 0);
+            
+            // Aggiorna titolo accordion
+            document.getElementById('local-slide-title').textContent = `Modifica Slide Corrente (${currentSlideIndex + 1}/${totalSlides})`;
 
             if (totalSlides > 0) {
                 suggerimentiOutput.innerHTML = slideSuggerimenti[currentSlideIndex];
@@ -1275,25 +1482,42 @@ Esempio di struttura JSON:
                     h1: { fontSize: '2rem' },
                     p: { fontSize: '1.1rem' },
                     small: { fontSize: '0.85rem' },
-                    themeNegativo: false
+                    colors: defaultColors,
+                    layout: 'mid-center'
                 };
 
                 const h1Styles = currentStyles.h1 || defaults.h1;
                 const pStyles = currentStyles.p || defaults.p;
                 const smallStyles = currentStyles.small || defaults.small;
+                const colors = { ...defaults.colors, ...(currentStyles.colors || {}) };
 
                 // Popola Dimensioni
                 document.getElementById('h1-size-input').value = parseFloat(h1Styles.fontSize) || parseFloat(defaults.h1.fontSize);
                 document.getElementById('p-size-input').value = parseFloat(pStyles.fontSize) || parseFloat(defaults.p.fontSize);
                 document.getElementById('small-size-input').value = parseFloat(smallStyles.fontSize) || parseFloat(defaults.small.fontSize);
                 
-                // Popola Tema Locale
-                const themeNegativo = currentStyles.themeNegativo || defaults.themeNegativo;
-                document.getElementById('local-theme-toggle').checked = themeNegativo;
+                // Popola Colori Locali
+                document.getElementById('color-bg-select').value = colors.bg;
+                document.getElementById('color-accent-select').value = colors.accent;
+                document.getElementById('color-text-select').value = colors.text;
+                document.getElementById('color-border-select').value = colors.border;
+                
+                // Aggiorna stato bottoni layout
+                const currentLayout = currentStyles.layout || defaults.layout;
+                document.querySelectorAll('.layout-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.layout === currentLayout);
+                });
 
 
             } else {
                  suggerimentiOutput.innerHTML = '<p style="color: #888;">...</p>';
+                 // Disattiva tutti i bottoni layout
+                 document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active'));
+                 // Resetta select colori
+                 document.getElementById('color-bg-select').value = defaultColors.bg;
+                 document.getElementById('color-accent-select').value = defaultColors.accent;
+                 document.getElementById('color-text-select').value = defaultColors.text;
+                 document.getElementById('color-border-select').value = defaultColors.border;
             }
         }
 
@@ -1329,7 +1553,7 @@ Esempio di struttura JSON:
         }
 
 
-        // Applica stili locali
+        // MODIFICA: Aggiornato per leggere/scrivere sui <select> del colore
         function applyLocalStyles(button) {
             if (totalSlides === 0) {
                 showButtonFeedback(button, 'Nessuna slide');
@@ -1345,14 +1569,20 @@ Esempio di struttura JSON:
             const h1Size = document.getElementById('h1-size-input').value + 'rem';
             const pSize = document.getElementById('p-size-input').value + 'rem';
             const smallSize = document.getElementById('small-size-input').value + 'rem';
-            const isNegativo = document.getElementById('local-theme-toggle').checked;
+            
+            const colors = {
+                bg: document.getElementById('color-bg-select').value,
+                accent: document.getElementById('color-accent-select').value,
+                text: document.getElementById('color-text-select').value,
+                border: document.getElementById('color-border-select').value
+            };
 
-            // 2. Costruisci l'oggetto stili (dimensioni + tema)
+            // 2. Costruisci l'oggetto stili (dimensioni + colori)
             const newStyles = {
                 h1: { fontSize: h1Size },
                 p: { fontSize: pSize },
                 small: { fontSize: smallSize },
-                themeNegativo: isNegativo
+                colors: colors
             };
 
             // 3. Applica gli stili come variabili CSS locali al blocco testo
@@ -1360,18 +1590,43 @@ Esempio di struttura JSON:
             currentTextBlock.style.setProperty('--local-p-size', pSize);
             currentTextBlock.style.setProperty('--local-small-size', smallSize);
             
-            // Applica/rimuovi classe tema alla slide
-            currentSlideElement.classList.toggle('theme-negativo', isNegativo);
+            // Applica colori
+            applySlideColors(currentSlideElement, currentTextBlock, colors);
 
-
-            // 4. Salva nello stato globale, preservando la posizione
+            // 4. Salva nello stato globale, preservando il layout
             if (!slideTextStyles[currentSlideIndex]) {
                 slideTextStyles[currentSlideIndex] = {};
             }
-            // Unisci i nuovi stili di testo (h1, p, small, tema) con la posizione esistente (top, left, etc)
+            // Unisci i nuovi stili di testo (h1, p, small, colors) con il layout esistente
             Object.assign(slideTextStyles[currentSlideIndex], newStyles);
 
             showButtonFeedback(button, 'Stili Locali Applicati!');
+        }
+
+        // NUOVA: Funzione per applicare layout
+        function applyLayout(layout) {
+            if (totalSlides === 0) return;
+            
+            const allSlides = scroller.querySelectorAll('.carousel-slide');
+            const currentSlideElement = allSlides[currentSlideIndex];
+            if (!currentSlideElement) return;
+
+            const styles = layoutMap[layout] || layoutMap['mid-center']; // Default
+            
+            // Applica gli stili al .carousel-slide (il contenitore flex)
+            currentSlideElement.style.justifyContent = styles.justifyContent;
+            currentSlideElement.style.alignItems = styles.alignItems;
+            
+            // Salva lo stato
+            if (!slideTextStyles[currentSlideIndex]) {
+                slideTextStyles[currentSlideIndex] = {};
+            }
+            slideTextStyles[currentSlideIndex].layout = layout;
+            
+            // Aggiorna UI dei bottoni
+            document.querySelectorAll('.layout-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.layout === layout);
+            });
         }
 
 
@@ -1398,9 +1653,6 @@ Esempio di struttura JSON:
                 updateCarouselState();
             }
         });
-        
-        // *** FUNZIONE SVG E PNG RIMOSSE ***
-
 
         function exportToPDF(button) {
             saveSuggerimento();
@@ -1472,7 +1724,7 @@ Esempio di struttura JSON:
                     testo_formattato: cleanHtml, 
                     suggerimento_visual: slideSuggerimenti[index] || '(Nessun suggerimento)',
                     background_image: slideBackgrounds[index] || null,
-                    text_styles: slideTextStyles[index] || {} // Salva stili locali (dimensioni + posizione + tema)
+                    text_styles: slideTextStyles[index] || {} // Salva stili locali (dimensioni + layout + colors)
                 });
             });
 
@@ -1517,7 +1769,7 @@ Esempio di struttura JSON:
             event.target.value = null;
         }
 
-        // --- Funzioni Immagini e Posizionamento ---
+        // --- Funzioni Immagini ---
 
         function triggerImageUpload(button) {
             if (totalSlides === 0) {
@@ -1546,74 +1798,81 @@ Esempio di struttura JSON:
             event.target.value = null;
         }
 
-        // Funzione per rendere il blocco trascinabile
-        function makeDraggable(element, index) {
-            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            element.onmousedown = dragMouseDown;
+        // --- NUOVE FUNZIONI: Aggiungi/Elimina Slide ---
 
-            function dragMouseDown(e) {
-                if (e.target.closest('h1, p, small, strong, blockquote')) {
-                     if (e.target !== element) {
-                         return;
-                     }
+        // MODIFICA: Aggiornato per impostare 'colors: defaultColors'
+        function addNewSlide(button) {
+            showButtonFeedback(button, 'Aggiunta...');
+            
+            const newIndex = currentSlideIndex + 1;
+            
+            const newSlideData = {
+                testo_formattato: `<h1>Slide ${newIndex + 1}</h1><p>Nuovo contenuto...</p>`,
+                suggerimento_visual: "(Nessun suggerimento)",
+                background_image: null,
+                text_styles: { 
+                    layout: 'mid-center', 
+                    colors: defaultColors // Usa i colori di default
                 }
-                
-                e = e || window.event;
-                e.preventDefault(); 
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                document.onmouseup = closeDragElement;
-                document.onmousemove = elementDrag;
+            };
+
+            // 1. Inserisci i dati negli array di stato
+            slideSuggerimenti.splice(newIndex, 0, newSlideData.suggerimento_visual);
+            slideBackgrounds.splice(newIndex, 0, newSlideData.background_image);
+            slideTextStyles.splice(newIndex, 0, newSlideData.text_styles);
+            
+            // 2. Crea l'elemento DOM
+            const newSlideElement = createSlideElement(newSlideData);
+            
+            // 3. Inserisci l'elemento nel DOM
+            const allSlides = scroller.querySelectorAll('.carousel-slide');
+            if (newIndex >= allSlides.length) {
+                scroller.appendChild(newSlideElement); // Aggiungi alla fine
+            } else {
+                scroller.insertBefore(newSlideElement, allSlides[newIndex]); // Inserisci in mezzo
             }
+            
+            // 4. Aggiorna stato e naviga
+            totalSlides++;
+            scrollCarousel(1); // Naviga alla nuova slide (aggiorna anche lo stato)
+            updateRiepilogoStampa();
+        }
 
-            function elementDrag(e) {
-                e = e || window.event;
-                e.preventDefault();
-                
-                if (element.style.position !== 'absolute') {
-                    const parentRect = element.parentElement.getBoundingClientRect();
-                    const rect = element.getBoundingClientRect();
-                    element.style.position = 'absolute';
-                    element.style.top = (rect.top - parentRect.top) + 'px';
-                    element.style.left = (rect.left - parentRect.left) + 'px';
-                }
-
-                pos1 = pos3 - e.clientX;
-                pos2 = pos4 - e.clientY;
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                
-                let newTop = element.offsetTop - pos2;
-                let newLeft = element.offsetLeft - pos1;
-                
-                const parent = element.parentElement;
-                
-                if (newTop < 0) newTop = 0;
-                if (newLeft < 0) newLeft = 0;
-                if (newTop + element.clientHeight > parent.clientHeight) {
-                    newTop = parent.clientHeight - element.clientHeight;
-                }
-                if (newLeft + element.clientWidth > parent.clientWidth) {
-                    newLeft = parent.clientWidth - element.clientWidth;
-                }
-
-                element.style.top = newTop + "px";
-                element.style.left = newLeft + "px";
+        function deleteCurrentSlide(button) {
+            if (totalSlides <= 1) {
+                showCustomAlert("Impossibile eliminare l'unica slide rimasta.");
+                return;
             }
-
-            function closeDragElement() {
-                document.onmouseup = null;
-                document.onmousemove = null;
-
-                if (!slideTextStyles[index]) {
-                    slideTextStyles[index] = {};
-                }
-                Object.assign(slideTextStyles[index], {
-                    position: 'absolute',
-                    top: element.style.top,
-                    left: element.style.left
-                });
+            
+            if (!confirm("Sei sicuro di voler eliminare questa slide?")) {
+                return;
             }
+            
+            showButtonFeedback(button, 'Eliminazione...');
+
+            const indexToDelete = currentSlideIndex;
+
+            // 1. Rimuovi i dati dagli array di stato
+            slideSuggerimenti.splice(indexToDelete, 1);
+            slideBackgrounds.splice(indexToDelete, 1);
+            slideTextStyles.splice(indexToDelete, 1);
+            
+            // 2. Rimuovi l'elemento dal DOM
+            const allSlides = scroller.querySelectorAll('.carousel-slide');
+            allSlides[indexToDelete].remove();
+            
+            // 3. Aggiorna stato
+            totalSlides--;
+            // Se elimini l'ultima, torna indietro
+            if (indexToDelete >= totalSlides) {
+                currentSlideIndex = totalSlides - 1;
+            }
+            
+            // Forza un "ri-allineamento" dello scroller e aggiorna l'UI
+            const scrollAmount = scroller.clientWidth * currentSlideIndex;
+            scroller.scrollTo({ left: scrollAmount, behavior: 'auto' });
+            updateCarouselState();
+            updateRiepilogoStampa();
         }
 
     </script>
