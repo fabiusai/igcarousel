@@ -94,7 +94,7 @@
             --local-h1-size: 2.2rem;
             --colore-testo-h1: var(--brand-blue);
             --colore-testo-p: var(--brand-dark);
-            --colore-deco: var(--brand-yellow); 
+            --colore-deco: var(--brand-yellow);
         }
 
         .text-overlay-block h1 { font-size: var(--local-h1-size); color: var(--colore-testo-h1); line-height: 1.1; margin: 0 0 1rem 0; letter-spacing: -0.5px; }
@@ -106,9 +106,9 @@
             border-left: 8px solid var(--colore-deco); 
             padding-left: 1.5rem; margin: 1.5rem 0;
             font-style: italic; 
-            font-weight: 400; /* Rimosso grassetto */
+            font-weight: 400; 
             color: var(--colore-testo-p);
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.05); /* LEGGERO SFONDO QUI */
         }
         
         /* STATISTICA (Big Number) */
@@ -120,6 +120,27 @@
         .text-overlay-block[contenteditable="true"]:hover { outline: 2px dashed var(--brand-blue); background: rgba(255,255,255,0.5); cursor: text; }
 
         /* --- TEMPLATES --- */
+
+        /* 5. QUOTE (Citazione Manager) - REVISIONATO */
+        .carousel-slide[data-template="quote"] { justify-content: center; align-items: center; text-align: center; padding: 4rem !important; }
+        .carousel-slide[data-template="quote"] .text-overlay-block blockquote {
+            /* FIX: Rimuove lo sfondo parziale per evitare discrepanze di colore */
+            background: transparent; 
+            border: none; 
+            padding: 0 2rem; margin: 0; 
+            font-size: 1.5rem; 
+            font-weight: 400; 
+            font-style: italic; line-height: 1.4; color: var(--colore-testo-p); position: relative; display: inline-block;
+        }
+        .carousel-slide[data-template="quote"] .text-overlay-block blockquote::before { content: "“"; font-family: serif; font-size: 6rem; line-height: 0; position: absolute; top: 0; left: -2rem; color: var(--colore-deco); opacity: 1; }
+        .carousel-slide[data-template="quote"] .text-overlay-block blockquote::after { content: "”"; font-family: serif; font-size: 6rem; line-height: 0; position: absolute; bottom: -2rem; right: -2rem; color: var(--colore-deco); opacity: 1; }
+        .carousel-slide[data-template="quote"] footer { margin-top: 2.5rem; display: flex; flex-direction: column; align-items: center; position: relative; }
+        .carousel-slide[data-template="quote"] footer::before { content: ""; width: 50px; height: 3px; background-color: var(--colore-deco); margin-bottom: 1rem; }
+        .carousel-slide[data-template="quote"] footer strong { display: block; font-size: 1.2rem; color: var(--colore-testo-h1); font-weight: 800; }
+        .carousel-slide[data-template="quote"] footer span { display: block; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-top: 0.2rem; color: var(--colore-testo-p); }
+        .carousel-slide[data-template="quote"] .text-overlay-block h1 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.7; margin-bottom: 2rem; }
+        
+        /* ALTRI TEMPLATE (CSS omesso per brevità, resta invariato) */
         .carousel-slide[data-template="full"] { justify-content: center; }
         .carousel-slide[data-template="card"] { padding: 3rem; justify-content: center; align-items: center; background-color: #e0e0e0; }
         .carousel-slide[data-template="card"] .text-overlay-block { background-color: #ffffff; padding: 2.5rem; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); --colore-testo-p: #333 !important; }
@@ -135,22 +156,6 @@
         .carousel-slide[data-template="list"] .text-overlay-block li { margin-bottom: 1rem; padding-left: 2rem; position: relative; }
         .carousel-slide[data-template="list"] .text-overlay-block li::before { content: "•"; color: var(--colore-deco); font-size: 2.5rem; line-height: 0; position: absolute; left: 0; top: 0.5rem; }
 
-        /* 5. QUOTE (Citazione Manager) - REVISIONATO */
-        .carousel-slide[data-template="quote"] { justify-content: center; align-items: center; text-align: center; padding: 4rem !important; }
-        .carousel-slide[data-template="quote"] .text-overlay-block h1 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.7; margin-bottom: 2rem; }
-        .carousel-slide[data-template="quote"] .text-overlay-block blockquote {
-            border: none; padding: 0 2rem; margin: 0; 
-            font-size: 1.5rem; /* RIDOTTO */
-            font-weight: 400; /* RIMOSSO GRASSETTO */
-            font-style: italic; line-height: 1.4; color: var(--colore-testo-p); position: relative; display: inline-block;
-        }
-        .carousel-slide[data-template="quote"] .text-overlay-block blockquote::before { content: "“"; font-family: serif; font-size: 6rem; line-height: 0; position: absolute; top: 0; left: -2rem; color: var(--colore-deco); opacity: 1; }
-        .carousel-slide[data-template="quote"] .text-overlay-block blockquote::after { content: "”"; font-family: serif; font-size: 6rem; line-height: 0; position: absolute; bottom: -2rem; right: -2rem; color: var(--colore-deco); opacity: 1; }
-        .carousel-slide[data-template="quote"] footer { margin-top: 2.5rem; display: flex; flex-direction: column; align-items: center; position: relative; }
-        .carousel-slide[data-template="quote"] footer::before { content: ""; width: 50px; height: 3px; background-color: var(--colore-deco); margin-bottom: 1rem; }
-        .carousel-slide[data-template="quote"] footer strong { display: block; font-size: 1.2rem; color: var(--colore-testo-h1); font-weight: 800; }
-        .carousel-slide[data-template="quote"] footer span { display: block; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-top: 0.2rem; color: var(--colore-testo-p); }
-
 
         /* --- NUOVI STILI RICH TEXT (UI) --- */
         .editor-toolbar {
@@ -165,6 +170,27 @@
 
 
         /* --- STAMPA PDF --- (Stili omessi per brevità, sono nel codice finale) */
+        @media print {
+            body * { visibility: hidden; }
+            #print-container, #print-container * { visibility: visible; }
+            #print-container { position: absolute; top: 0; left: 0; width: 100%; }
+            @page { margin: 1cm; size: A4; }
+            
+            .print-row { display: flex; gap: 2rem; margin-bottom: 2rem; page-break-inside: avoid; border-bottom: 1px solid #eee; padding-bottom: 2rem; }
+            .print-visual { width: 300px; height: 375px; border: 1px solid #ddd; position: relative; overflow: hidden; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            
+            .print-visual .carousel-slide { padding: 1.5rem !important; }
+            
+            .print-visual .carousel-slide[data-template="img-left"], .print-visual .carousel-slide[data-template="img-right"] { background-size: 50% 100% !important; -webkit-print-color-adjust: exact;}
+            
+            .print-visual h1 { font-size: 1.4rem !important; }
+            .print-visual p { font-size: 0.9rem !important; }
+            .print-visual .big-stat { font-size: 3rem !important; }
+
+            .print-info { flex: 1; font-size: 14px; color: #000; font-family: monospace;}
+            .print-header { font-size: 1.5rem; color: var(--brand-blue); border-bottom: 2px solid var(--brand-dark); margin-bottom: 1rem; padding-bottom: 0.5rem; }
+            .print-copy { white-space: pre-wrap; font-family: monospace; background: #f4f4f4; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; }
+        }
     </style>
 </head>
 <body>
@@ -180,7 +206,7 @@
         </nav>
 
         <div id="tab-generator" class="tab-content active">
-             <h2 class="section-title">Dati per l'AI</h2>
+            <h2 class="section-title">Dati per l'AI</h2>
             <div class="form-group">
                 <label>Argomento del Post</label>
                 <input type="text" id="inp-argomento" placeholder="Es. I vantaggi del nostro servizio premium">
