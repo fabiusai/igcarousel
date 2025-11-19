@@ -30,7 +30,7 @@
             line-height: 1.6;
         }
 
-        /* --- LAYOUT UI & HEADER --- */
+        /* --- LAYOUT UI --- */
         .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
 
         header {
@@ -101,54 +101,57 @@
         .text-overlay-block p, .text-overlay-block ul, .text-overlay-block ol { font-size: 1.1rem; color: var(--colore-testo-p); margin: 0 0 1rem 0; }
         .text-overlay-block strong { color: inherit; font-weight: 800; }
         
-        /* DECORAZIONE LATERALE (Barre rientrate) */
         .text-overlay-block blockquote {
             border-left: 8px solid var(--colore-deco); 
             padding-left: 1.5rem; margin: 1.5rem 0;
-            font-style: italic; 
-            font-weight: 400; 
+            font-style: italic; font-weight: 400; 
             color: var(--colore-testo-p);
-            background: rgba(255,255,255,0.05); /* LEGGERO SFONDO PER ALTRI TEMPLATE */
+            background: rgba(255,255,255,0.05);
         }
         
-        /* STATISTICA (Big Number) */
-        .big-stat {
-            font-size: 6rem; font-weight: 900; line-height: 1;
-            color: var(--colore-deco);
-            display: block; margin-bottom: 0.5rem;
-        }
+        .big-stat { font-size: 6rem; font-weight: 900; line-height: 1; color: var(--colore-deco); display: block; margin-bottom: 0.5rem; }
         .text-overlay-block[contenteditable="true"]:hover { outline: 2px dashed var(--brand-blue); background: rgba(255,255,255,0.5); cursor: text; }
 
         /* --- TEMPLATES --- */
 
-        /* 5. QUOTE (Citazione Manager) - REVISIONATO */
+        /* 5. QUOTE (Modificato per Spazio Foto) */
         .carousel-slide[data-template="quote"] { 
-            justify-content: center; align-items: center; text-align: center; padding: 4rem !important; 
-            --quote-font-size: 1.4rem; /* VARIABILE CSS PER LA DIMENSIONE DEL TESTO CITAZIONE */
+            justify-content: flex-end; /* Spinge il contenuto in basso */
+            align-items: center; text-align: center; padding: 4rem !important; 
+            --quote-font-size: 1.4rem;
         }
         
+        /* Guida Visiva per la foto (visibile solo a schermo, non in stampa/export immagine) */
+        .carousel-slide[data-template="quote"]::before {
+            content: "FOTO MANAGER";
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            font-size: 0.8rem; color: rgba(0,0,0,0.3); font-weight: bold;
+            width: 160px; height: 160px;
+            border: 2px dashed rgba(0,0,0,0.2); border-radius: 50%;
+            position: absolute; top: 12%; left: 50%; transform: translateX(-50%);
+            z-index: 0; pointer-events: none;
+        }
+        
+        .carousel-slide[data-template="quote"] .text-overlay-block {
+            position: relative; z-index: 1;
+            margin-top: 160px; /* Lascia lo spazio per la foto */
+        }
+
         .carousel-slide[data-template="quote"] .text-overlay-block blockquote {
-            /* FIX: Sfondo e Padding per look intenzionale */
-            background: rgba(255, 255, 255, 0.1); /* Sfondo leggero e definito */
-            border: none; 
-            padding: 1.5rem 3rem; /* Aumentato lo spazio intorno al testo */
-            margin: 0; 
-            font-size: var(--quote-font-size); /* Utilizza la variabile */
-            font-weight: 400; 
-            font-style: italic; line-height: 1.4; color: var(--colore-testo-p); position: relative; display: inline-block;
-            border-radius: 8px; /* Arrotondamento per look box */
+            background: rgba(255, 255, 255, 0.1);
+            border: none; padding: 1.5rem 3rem; margin: 0; 
+            font-size: var(--quote-font-size); 
+            font-weight: 400; font-style: italic; line-height: 1.4; color: var(--colore-testo-p); position: relative; display: inline-block;
+            border-radius: 8px;
         }
-        
         .carousel-slide[data-template="quote"] .text-overlay-block blockquote::before { content: "“"; font-family: serif; font-size: 6rem; line-height: 0; position: absolute; top: 0; left: -2rem; color: var(--colore-deco); opacity: 1; }
         .carousel-slide[data-template="quote"] .text-overlay-block blockquote::after { content: "”"; font-family: serif; font-size: 6rem; line-height: 0; position: absolute; bottom: -2rem; right: -2rem; color: var(--colore-deco); opacity: 1; }
         .carousel-slide[data-template="quote"] footer { margin-top: 2.5rem; display: flex; flex-direction: column; align-items: center; position: relative; }
         .carousel-slide[data-template="quote"] footer::before { content: ""; width: 50px; height: 3px; background-color: var(--colore-deco); margin-bottom: 1rem; }
         .carousel-slide[data-template="quote"] footer strong { display: block; font-size: 1.2rem; color: var(--colore-testo-h1); font-weight: 800; }
         .carousel-slide[data-template="quote"] footer span { display: block; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-top: 0.2rem; color: var(--colore-testo-p); }
-        .carousel-slide[data-template="quote"] .text-overlay-block h1 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.7; margin-bottom: 2rem; }
         
-        
-        /* ALTRI TEMPLATE (CSS omesso per brevità, resta invariato) */
+        /* ALTRI TEMPLATE */
         .carousel-slide[data-template="full"] { justify-content: center; }
         .carousel-slide[data-template="card"] { padding: 3rem; justify-content: center; align-items: center; background-color: #e0e0e0; }
         .carousel-slide[data-template="card"] .text-overlay-block { background-color: #ffffff; padding: 2.5rem; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); --colore-testo-p: #333 !important; }
@@ -164,43 +167,55 @@
         .carousel-slide[data-template="list"] .text-overlay-block li { margin-bottom: 1rem; padding-left: 2rem; position: relative; }
         .carousel-slide[data-template="list"] .text-overlay-block li::before { content: "•"; color: var(--colore-deco); font-size: 2.5rem; line-height: 0; position: absolute; left: 0; top: 0.5rem; }
 
-
-        /* --- NUOVI STILI RICH TEXT (UI) --- */
-        .editor-toolbar {
-            display: flex; gap: 0.5rem; margin-bottom: 1rem; padding: 0.75rem; border: 1px solid #ccc; border-radius: 8px; background: #fff; flex-wrap: wrap;
-        }
-        .editor-toolbar button, .editor-toolbar select {
-            padding: 0.4rem 0.6rem; font-size: 0.9rem; border: 1px solid #ddd; background: #f9f9f9; border-radius: 4px; cursor: pointer; transition: background 0.1s;
-        }
+        /* --- UI CONTROLS --- */
+        .editor-toolbar { display: flex; gap: 0.5rem; margin-bottom: 1rem; padding: 0.75rem; border: 1px solid #ccc; border-radius: 8px; background: #fff; flex-wrap: wrap; }
+        .editor-toolbar button, .editor-toolbar select { padding: 0.4rem 0.6rem; font-size: 0.9rem; border: 1px solid #ddd; background: #f9f9f9; border-radius: 4px; cursor: pointer; transition: background 0.1s; }
         .editor-toolbar button:hover { background: #e0e0e0; }
-        .editor-toolbar select { width: 100px; }
         .editor-toolbar .color-preview { width: 15px; height: 15px; border-radius: 50%; display: inline-block; margin-right: 5px; border: 1px solid #ccc; vertical-align: middle; }
 
-
-        /* --- STAMPA PDF --- */
+        /* --- STAMPA PDF STORYBOARD (NUOVO LAYOUT) --- */
         @media print {
             body * { visibility: hidden; }
             #print-container, #print-container * { visibility: visible; }
-            #print-container { position: absolute; top: 0; left: 0; width: 100%; }
-            @page { margin: 1cm; size: A4; }
+            #print-container { position: absolute; top: 0; left: 0; width: 100%; background: #fff; color: #000; }
+            @page { margin: 1.5cm; size: A4; }
             
-            .print-row { display: flex; gap: 2rem; margin-bottom: 2rem; page-break-inside: avoid; border-bottom: 1px solid #eee; padding-bottom: 2rem; }
-            .print-visual { width: 300px; height: 375px; border: 1px solid #ddd; position: relative; overflow: hidden; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            
-            .print-visual .carousel-slide { padding: 1.5rem !important; }
-            
-            .print-visual .carousel-slide[data-template="img-left"], .print-visual .carousel-slide[data-template="img-right"] { background-size: 50% 100% !important; -webkit-print-color-adjust: exact;}
-            
-            .print-visual h1 { font-size: 1.4rem !important; }
-            .print-visual p { font-size: 0.9rem !important; }
-            .print-visual .big-stat { font-size: 3rem !important; }
-            .print-visual .carousel-slide[data-template="quote"] .text-overlay-block blockquote { font-size: 1.2rem !important; padding: 1rem 2rem; }
-            .print-visual .carousel-slide[data-template="quote"] .text-overlay-block blockquote::before,
-            .print-visual .carousel-slide[data-template="quote"] .text-overlay-block blockquote::after { font-size: 4rem !important; }
+            /* Nascondiamo la guida foto manager in stampa */
+            .carousel-slide[data-template="quote"]::before { display: none !important; }
 
-            .print-info { flex: 1; font-size: 14px; color: #000; font-family: monospace;}
-            .print-header { font-size: 1.5rem; color: var(--brand-blue); border-bottom: 2px solid var(--brand-dark); margin-bottom: 1rem; padding-bottom: 0.5rem; }
-            .print-copy { white-space: pre-wrap; font-family: monospace; background: #f4f4f4; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; }
+            .print-header { margin-bottom: 2rem; border-bottom: 4px solid var(--brand-blue); padding-bottom: 1rem; }
+            .print-header h1 { margin: 0; color: var(--brand-blue); font-size: 24pt; }
+            .print-copy-section { background: #f8f8f8; padding: 1.5rem; border-radius: 8px; margin-bottom: 3rem; font-family: 'Courier New', monospace; border-left: 4px solid #ccc; }
+            
+            .print-slide-row {
+                display: grid; grid-template-columns: 300px 1fr; gap: 2rem;
+                margin-bottom: 3rem; page-break-inside: avoid;
+                border-bottom: 1px solid #eee; padding-bottom: 2rem;
+            }
+
+            .print-visual {
+                width: 300px; height: 375px; /* 4:5 Ratio */
+                border: 1px solid #000; 
+                overflow: hidden; position: relative;
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
+            
+            /* Ridimensionamento contenuto per la stampa */
+            .print-visual .carousel-slide { padding: 1rem !important; }
+            .print-visual h1 { font-size: 16pt !important; }
+            .print-visual p { font-size: 11pt !important; }
+            .print-visual .big-stat { font-size: 36pt !important; }
+            .print-visual blockquote { font-size: 14pt !important; padding: 1rem !important; }
+            
+            /* Forza background in stampa */
+            .print-visual .carousel-slide[data-template="img-left"], 
+            .print-visual .carousel-slide[data-template="img-right"] { 
+                background-size: 50% 100% !important; -webkit-print-color-adjust: exact;
+            }
+
+            .print-info h3 { margin-top: 0; color: var(--brand-blue); border-bottom: 2px solid var(--brand-yellow); display: inline-block; padding-bottom: 5px; }
+            .print-info p { margin-bottom: 0.5rem; }
+            .print-notes { margin-top: 2rem; border: 1px dashed #ccc; height: 100px; padding: 0.5rem; color: #ccc; }
         }
     </style>
 </head>
@@ -270,91 +285,63 @@
                     <div id="visual-controls" style="display:none;">
                         
                         <div class="control-group">
-                            <summary>Formattazione Testo Selezionato</summary>
+                            <summary>Formattazione Testo</summary>
                             <div id="editor-toolbar" class="editor-toolbar">
-                                <button onclick="formatText('bold')"><b>Grassetto</b></button>
-                                <button onclick="formatText('italic')"><i>Corsivo</i></button>
-                                <button onclick="formatText('removeFormat')">Normale</button>
+                                <button onclick="formatText('bold')"><b>B</b></button>
+                                <button onclick="formatText('italic')"><i>I</i></button>
+                                <button onclick="formatText('removeFormat')">Tx</button>
                                 
                                 <select id="color-selector" onchange="formatText('foreColor', this.value)" style="flex-grow: 1;">
-                                    <option value="" disabled selected>Colore Selezionato...</option>
-                                    <option value="#000000"><span class="color-preview" style="background:#000;"></span>Nero</option>
-                                    <option value="#0146bc"><span class="color-preview" style="background:#0146bc;"></span>Blu Brand</option>
-                                    <option value="#eddc01"><span class="color-preview" style="background:#eddc01;"></span>Giallo Brand</option>
-                                    <option value="#d93025"><span class="color-preview" style="background:#d93025;"></span>Rosso (Errore)</option>
+                                    <option value="" disabled selected>Colore...</option>
+                                    <option value="#000000">Nero</option>
+                                    <option value="#0146bc">Blu Brand</option>
+                                    <option value="#eddc01">Giallo Brand</option>
+                                    <option value="#ffffff">Bianco</option>
                                 </select>
                             </div>
-                            <small style="display: block; color: #888; margin-top: -0.5rem;">* Seleziona il testo nell'anteprima per applicare.</small>
                         </div>
                         
                         <details class="control-group" open>
                             <summary>Layout & Template</summary>
                             <div class="template-grid">
-                                <button class="icon-btn active" data-tpl="full" onclick="setTemplate('full')">Standard Full</button>
-                                <button class="icon-btn" data-tpl="card" onclick="setTemplate('card')">Box / Card</button>
-                                <button class="icon-btn" data-tpl="img-left" onclick="setTemplate('img-left')">Img SX / Testo DX</button>
-                                <button class="icon-btn" data-tpl="img-right" onclick="setTemplate('img-right')">Img DX / Testo SX</button>
-                                <button class="icon-btn" data-tpl="split-up" onclick="setTemplate('split-up')">Split (Img Su)</button>
-                                <button class="icon-btn" data-tpl="split-down" onclick="setTemplate('split-down')">Split (Img Giù)</button>
+                                <button class="icon-btn active" data-tpl="full" onclick="setTemplate('full')">Standard</button>
+                                <button class="icon-btn" data-tpl="card" onclick="setTemplate('card')">Card</button>
+                                <button class="icon-btn" data-tpl="img-left" onclick="setTemplate('img-left')">Img SX</button>
+                                <button class="icon-btn" data-tpl="img-right" onclick="setTemplate('img-right')">Img DX</button>
+                                <button class="icon-btn" data-tpl="split-up" onclick="setTemplate('split-up')">Split Su</button>
+                                <button class="icon-btn" data-tpl="split-down" onclick="setTemplate('split-down')">Split Giù</button>
                                 <button class="icon-btn" data-tpl="quote" onclick="setTemplate('quote')">Citazione</button>
-                                <button class="icon-btn" data-tpl="stat" onclick="setTemplate('stat')">Statistica Big</button>
-                                <button class="icon-btn" data-tpl="list" onclick="setTemplate('list')">Elenco Puntato</button>
+                                <button class="icon-btn" data-tpl="stat" onclick="setTemplate('stat')">Statistica</button>
+                                <button class="icon-btn" data-tpl="list" onclick="setTemplate('list')">Elenco</button>
                             </div>
                         </details>
 
-                        <details class="control-group" open>
-                            <summary>Controlli Tipografia</summary>
-                            <div class="form-group" id="quote-size-control">
-                                <label>Dimensione Testo Citazione</label>
-                                <select id="sel-quote-size" onchange="updateStyle('quoteSize', this.value)">
-                                    <option value="1.2rem">Piccolo (1.2rem)</option>
-                                    <option value="1.4rem" selected>Medio (1.4rem)</option>
-                                    <option value="1.6rem">Grande (1.6rem)</option>
-                                    <option value="1.8rem">Extra Large (1.8rem)</option>
-                                </select>
-                            </div>
-                        </details>
-                        <details class="control-group" open>
-                            <summary>Colori (Tutto Giallo Attivo)</summary>
+                        <details class="control-group">
+                            <summary>Colori</summary>
                             <div style="margin-top: 1rem;">
-                                
                                 <div class="form-group">
-                                    <label>Sfondo Slide</label>
+                                    <label>Sfondo</label>
                                     <select id="sel-bg" onchange="updateStyle('bg', this.value)">
-                                        <option value="#ffffff">Bianco (Brand Light)</option>
-                                        <option value="#222222">Grigio Scuro (Brand Dark)</option>
-                                        <option value="#0146bc">Blu Istituzionale</option>
+                                        <option value="#ffffff">Bianco</option>
+                                        <option value="#222222">Grigio Scuro</option>
+                                        <option value="#0146bc">Blu Brand</option>
                                         <option value="#eddc01">Giallo Brand</option>
                                     </select>
                                 </div>
-
                                 <div class="form-group">
-                                    <label>Testo Corpo (p, li)</label>
+                                    <label>Testo Base</label>
                                     <select id="sel-text" onchange="updateStyle('text', this.value)">
-                                        <option value="#333333">Nero / Grigio Scuro</option>
+                                        <option value="#333333">Grigio Scuro</option>
                                         <option value="#ffffff">Bianco</option>
-                                        <option value="#0146bc">Blu Istituzionale</option>
-                                        <option value="#eddc01">Giallo Brand</option>
+                                        <option value="#0146bc">Blu Brand</option>
                                     </select>
                                 </div>
-
                                 <div class="form-group">
-                                    <label>Titoli (h1)</label>
+                                    <label>Accento (Titoli)</label>
                                     <select id="sel-accent" onchange="updateStyle('accent', this.value)">
-                                        <option value="#0146bc">Blu Istituzionale</option>
+                                        <option value="#0146bc">Blu Brand</option>
                                         <option value="#eddc01">Giallo Brand</option>
                                         <option value="#ffffff">Bianco</option>
-                                        <option value="#222222">Grigio Scuro</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Decorazioni / Bordi / Stat</label>
-                                    <select id="sel-deco" onchange="updateStyle('deco', this.value)">
-                                        <option value="#eddc01">Giallo Brand</option>
-                                        <option value="#0146bc">Blu Istituzionale</option>
-                                        <option value="#ffffff">Bianco</option>
-                                        <option value="#222222">Grigio Scuro</option>
                                     </select>
                                 </div>
                             </div>
@@ -362,22 +349,31 @@
 
                         <details class="control-group">
                             <summary>Immagine</summary>
-                            <p id="suggerimento-visual" style="font-size: 0.85rem; background: #fffde7; padding: 0.5rem; margin-top:1rem;">AI: ...</p>
-                            <button class="btn btn-neutral" style="width:100%" onclick="document.getElementById('img-upload').click()">Carica Immagine</button>
+                            <button class="btn btn-neutral" style="width:100%" onclick="document.getElementById('img-upload').click()">Carica Sfondo</button>
                             <input type="file" id="img-upload" style="display:none" accept="image/*" onchange="uploadImage(event)">
                             <button class="btn btn-danger" style="width:100%; margin-top:0.5rem;" onclick="removeImage()">Rimuovi</button>
                         </details>
-
-                        <div class="button-grid" style="margin-top: 1rem;">
-                            <button class="btn btn-secondary" onclick="addSlide()">+ Nuova Slide</button>
-                            <button class="btn btn-danger" onclick="removeSlide()">Elimina</button>
+                        
+                        <div class="control-group">
+                            <summary>Gestione Slide</summary>
+                            <div class="button-grid" style="margin-top: 0.5rem;">
+                                <button class="btn btn-neutral" onclick="moveSlideSequence(-1)" title="Sposta slide corrente indietro">▲ Sposta Su</button>
+                                <button class="btn btn-neutral" onclick="moveSlideSequence(1)" title="Sposta slide corrente avanti">▼ Sposta Giù</button>
+                            </div>
+                            <div class="button-grid" style="margin-top: 0.5rem;">
+                                <button class="btn btn-secondary" onclick="addSlide()">+ Standard</button>
+                                <button class="btn btn-secondary" style="background:#fff; border:2px solid #eddc01;" onclick="addEmptySlide()">+ Vuota</button>
+                            </div>
+                             <button class="btn btn-danger" style="width:100%; margin-top:0.5rem;" onclick="removeSlide()">Elimina Corrente</button>
                         </div>
+
                     </div>
 
                     <div class="control-group" style="margin-top: 1rem;">
                         <label>Esporta</label>
                         <div class="button-grid">
                             <button class="btn btn-neutral" onclick="exportJson()">Salva JSON</button>
+                            <button class="btn btn-primary" onclick="exportWord()">SCARICA WORD</button>
                             <button class="btn btn-primary" onclick="exportPdf()">STAMPA PDF</button>
                         </div>
                     </div>
@@ -391,7 +387,7 @@
     <script>
         // --- COSTANTI ---
         const LOREM_TITLE = "Titolo Provvisorio";
-        const LOREM_BODY = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nibh augue, suscipit a, scelerisque sed, lacinia in, mi.";
+        const LOREM_BODY = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
         
         const BRAND = {
             blue: '#0146bc',
@@ -406,16 +402,11 @@
         let currentSlideIdx = 0;
         let copyPost = "";
 
-        // --- GESTIONE FORMATTAZIONE TESTO SELEZIONATO ---
+        // --- FORMATTAZIONE TESTO ---
         function formatText(command, value = null) {
-            // Applica il comando al testo selezionato nell'area contenteditable
             document.execCommand(command, false, value);
-            
-            // Re-focus sull'area per permettere di continuare a scrivere
             const currentSlideElement = document.getElementById('carousel-scroller').querySelector('.text-overlay-block');
-            if (currentSlideElement) {
-                currentSlideElement.focus();
-            }
+            if (currentSlideElement) currentSlideElement.focus();
         }
         
         // --- TABS ---
@@ -436,25 +427,7 @@
 Agisci come Social Media Manager. Crea uno storyboard per un carosello (4-8 slide).
 ARGOMENTO: ${arg}
 INPUT: ${txt}
-
-ISTRUZIONI FORMATO SLIDE:
-1. Usa vari layout (Citazione, Statistica, Img Laterale, Elenco) per variare il ritmo.
-2. Per le Citazioni, la struttura HTML obbligatoria è: <blockquote>Testo della citazione</blockquote><footer><strong>Nome Cognome</strong><span>Ruolo Aziendale</span></footer>. Non usare il tag <strong> sul testo della citazione.
-3. Per evidenziare concetti, usa il tag <blockquote> per attivare la barra laterale colorata.
-4. Per le Statistiche, usa <span class="big-stat">Numero o Percentuale</span>.
-
-OUTPUT JSON (Obbligatorio):
-{
-  "copy_post": "Testo caption...",
-  "slides": [
-    {
-      "testo_html": "HTML della slide come da istruzioni",
-      "suggerimento_visual": "Descrizione immagine...",
-      "background_image": null,
-      "text_styles": { "colors": {"bg": "#ffffff", "text": "#333333", "accent": "#0146bc", "deco": "#eddc01"}, "template": "full", "quoteSize": "1.4rem" }
-    }
-  ]
-}
+OUTPUT JSON (Obbligatorio): { "copy_post": "...", "slides": [ { "testo_html": "...", "suggerimento_visual": "...", "text_styles": { "template": "full", "colors": {"bg":"#fff", "text":"#333", "accent":"#0146bc", "deco":"#eddc01"} } } ] }
 `;
             document.getElementById('out-prompt').value = prompt.trim();
             document.getElementById('prompt-result').style.display = 'block';
@@ -480,7 +453,7 @@ OUTPUT JSON (Obbligatorio):
                     styles: s.text_styles || { 
                         colors: { bg: BRAND.light, text: BRAND.textDark, accent: BRAND.blue, deco: BRAND.yellow }, 
                         template: 'full',
-                        quoteSize: '1.4rem' // Default size
+                        quoteSize: '1.4rem'
                     }
                 }));
 
@@ -495,30 +468,22 @@ OUTPUT JSON (Obbligatorio):
         function createSlideDOM(slideData) {
             const wrapper = document.createElement('div');
             wrapper.className = 'carousel-slide';
-            
             let tpl = slideData.styles.template || 'full';
             wrapper.setAttribute('data-template', tpl);
 
             if(slideData.bgImage) wrapper.style.backgroundImage = `url(${slideData.bgImage})`;
 
-            // Applicazione Colori CSS
             const c = slideData.styles.colors || { bg: BRAND.light, text: BRAND.textDark, accent: BRAND.blue, deco: BRAND.yellow };
             wrapper.style.setProperty('--colore-sfondo-slide', c.bg);
-
-            // Applicazione Dimensione Testo Citazione
-            if(slideData.styles.quoteSize) {
-                wrapper.style.setProperty('--quote-font-size', slideData.styles.quoteSize);
-            }
+            if(slideData.styles.quoteSize) wrapper.style.setProperty('--quote-font-size', slideData.styles.quoteSize);
 
             const textBlock = document.createElement('div');
             textBlock.className = 'text-overlay-block';
             textBlock.innerHTML = slideData.html;
             textBlock.contentEditable = true;
 
-            // Listener update html
             textBlock.addEventListener('input', function() { slidesData[currentSlideIdx].html = this.innerHTML; });
 
-            // Mapping variabili CSS
             textBlock.style.setProperty('--colore-testo-h1', c.accent);
             textBlock.style.setProperty('--colore-testo-p', c.text);
             textBlock.style.setProperty('--colore-deco', c.deco);
@@ -536,13 +501,10 @@ OUTPUT JSON (Obbligatorio):
             const domEl = createSlideDOM(slide);
             scroller.appendChild(domEl);
 
-            // Update UI
             document.getElementById('lbl-pager').innerText = `${currentSlideIdx + 1} / ${slidesData.length}`;
             document.getElementById('btn-prev').disabled = currentSlideIdx === 0;
             document.getElementById('btn-next').disabled = currentSlideIdx === slidesData.length - 1;
-            document.getElementById('suggerimento-visual').innerText = "Visual AI: " + (slide.visualDesc || "Nessuno");
-
-            // Sync Selectors
+            
             const c = slide.styles.colors || { bg: BRAND.light, text: BRAND.textDark, accent: BRAND.blue, deco: BRAND.yellow };
             const tpl = slide.styles.template || 'full';
             
@@ -555,10 +517,7 @@ OUTPUT JSON (Obbligatorio):
             setSelect('sel-text', c.text);
             setSelect('sel-accent', c.accent);
             setSelect('sel-deco', c.deco);
-            setSelect('sel-quote-size', slide.styles.quoteSize || '1.4rem');
 
-
-            // Highlight template btn
             document.querySelectorAll('.template-grid .icon-btn').forEach(b => {
                 b.classList.toggle('active', b.dataset.tpl === tpl);
             });
@@ -567,38 +526,40 @@ OUTPUT JSON (Obbligatorio):
         // --- AZIONI MODIFICA ---
         function moveSlide(dir) { currentSlideIdx += dir; renderCurrentSlide(); }
 
+        function moveSlideSequence(direction) {
+            const newIdx = currentSlideIdx + direction;
+            if (newIdx < 0 || newIdx >= slidesData.length) return;
+            
+            // Scambia elementi nell'array
+            const temp = slidesData[newIdx];
+            slidesData[newIdx] = slidesData[currentSlideIdx];
+            slidesData[currentSlideIdx] = temp;
+            
+            currentSlideIdx = newIdx;
+            renderCurrentSlide();
+        }
+
         function setTemplate(tpl) {
             if(!slidesData[currentSlideIdx].styles) slidesData[currentSlideIdx].styles = {};
             slidesData[currentSlideIdx].styles.template = tpl;
             
             let currentHtml = slidesData[currentSlideIdx].html;
-
-            // Logica di auto-inserimento HTML in base al template
             if(tpl === 'stat' && !currentHtml.includes('big-stat')) {
                  slidesData[currentSlideIdx].html = `<h1>Statistica</h1><span class="big-stat">85%</span><p>Di Risparmio</p>`;
             }
             if(tpl === 'quote' && !currentHtml.includes('<footer>')) {
-                // Aggiungiamo il default del box intenzionale quando si imposta il template quote
                 const quoteContent = currentHtml.includes('blockquote') ? currentHtml.match(/<blockquote>(.*?)<\/blockquote>/s)[0] : `<blockquote>${LOREM_BODY}</blockquote>`;
                 slidesData[currentSlideIdx].html = `<h1>Citazione Leader</h1>${quoteContent}<footer><strong>Nome Cognome</strong><span>Ruolo Aziendale</span></footer>`;
             }
-            if(tpl === 'list' && !currentHtml.includes('<ul>')) {
-                 slidesData[currentSlideIdx].html = `<h1>Punti Chiave</h1><ul><li>Punto uno</li><li>Punto due</li><li>Punto tre</li></ul>`;
-            }
-
             renderCurrentSlide();
         }
 
         function updateStyle(prop, val) {
             if(!slidesData[currentSlideIdx].styles) slidesData[currentSlideIdx].styles = {};
-
-            if(prop === 'bg' || prop === 'text' || prop === 'accent' || prop === 'deco') {
+            if(!['quoteSize'].includes(prop)) {
                 if(!slidesData[currentSlideIdx].styles.colors) slidesData[currentSlideIdx].styles.colors = {};
                 slidesData[currentSlideIdx].styles.colors[prop] = val;
-            } else if (prop === 'quoteSize') {
-                slidesData[currentSlideIdx].styles.quoteSize = val;
-            }
-            
+            } 
             renderCurrentSlide();
         }
 
@@ -613,28 +574,24 @@ OUTPUT JSON (Obbligatorio):
             reader.readAsDataURL(file);
             e.target.value = '';
         }
+        function removeImage() { slidesData[currentSlideIdx].bgImage = null; renderCurrentSlide(); }
 
-        function removeImage() {
-            slidesData[currentSlideIdx].bgImage = null;
-            renderCurrentSlide();
-        }
-
-        // --- AGGIUNTA SLIDE CON LOREM IPSUM ---
         function addSlide() {
-            const loremHtml = `
-                <h1>${LOREM_TITLE}</h1>
-                <p>${LOREM_BODY}</p>
-                <blockquote>Punto chiave evidenziato con barra laterale.</blockquote>
-            `;
-            
+            const loremHtml = `<h1>${LOREM_TITLE}</h1><p>${LOREM_BODY}</p><blockquote>Punto chiave.</blockquote>`;
             slidesData.splice(currentSlideIdx + 1, 0, {
                 html: loremHtml,
-                visualDesc: "Nuova slide generata manualmente con Lorem Ipsum",
-                styles: { 
-                    template: 'full', 
-                    colors: { bg: BRAND.light, text: BRAND.textDark, accent: BRAND.blue, deco: BRAND.yellow },
-                    quoteSize: '1.4rem' // Default size
-                }
+                visualDesc: "Slide manuale",
+                styles: { template: 'full', colors: { bg: BRAND.light, text: BRAND.textDark, accent: BRAND.blue, deco: BRAND.yellow }, quoteSize: '1.4rem' }
+            });
+            currentSlideIdx++;
+            renderCurrentSlide();
+        }
+        
+        function addEmptySlide() {
+             slidesData.splice(currentSlideIdx + 1, 0, {
+                html: "",
+                visualDesc: "Slide vuota",
+                styles: { template: 'full', colors: { bg: BRAND.light, text: BRAND.textDark, accent: BRAND.blue, deco: BRAND.yellow } }
             });
             currentSlideIdx++;
             renderCurrentSlide();
@@ -669,34 +626,89 @@ OUTPUT JSON (Obbligatorio):
             reader.readAsText(file);
         }
 
+        function exportWord() {
+            if(slidesData.length === 0) return alert("Nessun dato da esportare");
+            
+            let htmlContent = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head><meta charset='utf-8'><title>Export Word</title>
+            <style>
+                body { font-family: Arial, sans-serif; }
+                table { border-collapse: collapse; width: 100%; }
+                td, th { border: 1px solid #999; padding: 0.5rem; vertical-align: top; }
+                th { background: #eee; }
+                h1 { color: #0146bc; }
+                .copy-box { background: #f0f0f0; padding: 1rem; margin-bottom: 2rem; white-space: pre-wrap; }
+            </style>
+            </head><body>
+            <h1>Storyboard Carosello</h1>
+            <h3>Copy / Caption del Post</h3>
+            <div class="copy-box">${copyPost}</div>
+            <h3>Dettaglio Slide</h3>
+            <table>
+                <thead><tr><th width="10%">N.</th><th width="50%">Contenuto Testuale</th><th width="40%">Note Visual & Template</th></tr></thead>
+                <tbody>
+            `;
+            
+            slidesData.forEach((slide, i) => {
+                // Rimuovi tag HTML per una lettura pulita in tabella Word
+                let cleanText = slide.html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                htmlContent += `
+                    <tr>
+                        <td><strong>${i+1}</strong></td>
+                        <td>${slide.html}</td>
+                        <td>
+                            <strong>Template:</strong> ${slide.styles.template}<br>
+                            <strong>Visual AI:</strong> ${slide.visualDesc}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            htmlContent += `</tbody></table></body></html>`;
+            
+            const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'storyboard-testi.doc';
+            a.click();
+        }
+
         function exportPdf() {
             const container = document.getElementById('print-container');
             container.innerHTML = '';
             
             const header = document.createElement('div');
             header.className = 'print-header';
-            header.innerHTML = 'Storyboard Brand';
+            header.innerHTML = '<h1>Storyboard Visuale</h1>';
             container.appendChild(header);
 
             const copyBox = document.createElement('div');
-            copyBox.className = 'print-copy';
-            copyBox.innerText = copyPost;
+            copyBox.className = 'print-copy-section';
+            copyBox.innerHTML = `<strong>COPY (CAPTION):</strong>\n\n${copyPost}`;
             container.appendChild(copyBox);
 
             slidesData.forEach((slide, idx) => {
                 const row = document.createElement('div');
-                row.className = 'print-row';
+                row.className = 'print-slide-row';
 
+                // Colonna Visuale
                 const visual = document.createElement('div');
                 visual.className = 'print-visual';
-                
                 const domClone = createSlideDOM(slide);
                 domClone.querySelector('.text-overlay-block').contentEditable = false;
                 visual.appendChild(domClone);
 
+                // Colonna Info
                 const info = document.createElement('div');
                 info.className = 'print-info';
-                info.innerHTML = `<strong>Slide ${idx+1}</strong><br>Template: ${slide.styles.template}<br><br>Suggerimento AI:<br>${slide.visualDesc}`;
+                info.innerHTML = `
+                    <h3>Slide ${idx+1}</h3>
+                    <p><strong>Template:</strong> ${slide.styles.template}</p>
+                    <p><strong>Suggerimento Immagine:</strong><br>${slide.visualDesc}</p>
+                    <div class="print-notes">Spazio per note manuali...</div>
+                `;
 
                 row.appendChild(visual);
                 row.appendChild(info);
