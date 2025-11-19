@@ -108,7 +108,7 @@
             font-style: italic; 
             font-weight: 400; 
             color: var(--colore-testo-p);
-            background: rgba(255,255,255,0.05); /* LEGGERO SFONDO QUI */
+            background: rgba(255,255,255,0.05); /* LEGGERO SFONDO PER ALTRI TEMPLATE */
         }
         
         /* STATISTICA (Big Number) */
@@ -122,16 +122,23 @@
         /* --- TEMPLATES --- */
 
         /* 5. QUOTE (Citazione Manager) - REVISIONATO */
-        .carousel-slide[data-template="quote"] { justify-content: center; align-items: center; text-align: center; padding: 4rem !important; }
+        .carousel-slide[data-template="quote"] { 
+            justify-content: center; align-items: center; text-align: center; padding: 4rem !important; 
+            --quote-font-size: 1.4rem; /* VARIABILE CSS PER LA DIMENSIONE DEL TESTO CITAZIONE */
+        }
+        
         .carousel-slide[data-template="quote"] .text-overlay-block blockquote {
-            /* FIX: Rimuove lo sfondo parziale per evitare discrepanze di colore */
-            background: transparent; 
+            /* FIX: Sfondo e Padding per look intenzionale */
+            background: rgba(255, 255, 255, 0.1); /* Sfondo leggero e definito */
             border: none; 
-            padding: 0 2rem; margin: 0; 
-            font-size: 1.5rem; 
+            padding: 1.5rem 3rem; /* Aumentato lo spazio intorno al testo */
+            margin: 0; 
+            font-size: var(--quote-font-size); /* Utilizza la variabile */
             font-weight: 400; 
             font-style: italic; line-height: 1.4; color: var(--colore-testo-p); position: relative; display: inline-block;
+            border-radius: 8px; /* Arrotondamento per look box */
         }
+        
         .carousel-slide[data-template="quote"] .text-overlay-block blockquote::before { content: "“"; font-family: serif; font-size: 6rem; line-height: 0; position: absolute; top: 0; left: -2rem; color: var(--colore-deco); opacity: 1; }
         .carousel-slide[data-template="quote"] .text-overlay-block blockquote::after { content: "”"; font-family: serif; font-size: 6rem; line-height: 0; position: absolute; bottom: -2rem; right: -2rem; color: var(--colore-deco); opacity: 1; }
         .carousel-slide[data-template="quote"] footer { margin-top: 2.5rem; display: flex; flex-direction: column; align-items: center; position: relative; }
@@ -139,6 +146,7 @@
         .carousel-slide[data-template="quote"] footer strong { display: block; font-size: 1.2rem; color: var(--colore-testo-h1); font-weight: 800; }
         .carousel-slide[data-template="quote"] footer span { display: block; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-top: 0.2rem; color: var(--colore-testo-p); }
         .carousel-slide[data-template="quote"] .text-overlay-block h1 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.7; margin-bottom: 2rem; }
+        
         
         /* ALTRI TEMPLATE (CSS omesso per brevità, resta invariato) */
         .carousel-slide[data-template="full"] { justify-content: center; }
@@ -169,7 +177,7 @@
         .editor-toolbar .color-preview { width: 15px; height: 15px; border-radius: 50%; display: inline-block; margin-right: 5px; border: 1px solid #ccc; vertical-align: middle; }
 
 
-        /* --- STAMPA PDF --- (Stili omessi per brevità, sono nel codice finale) */
+        /* --- STAMPA PDF --- */
         @media print {
             body * { visibility: hidden; }
             #print-container, #print-container * { visibility: visible; }
@@ -186,6 +194,9 @@
             .print-visual h1 { font-size: 1.4rem !important; }
             .print-visual p { font-size: 0.9rem !important; }
             .print-visual .big-stat { font-size: 3rem !important; }
+            .print-visual .carousel-slide[data-template="quote"] .text-overlay-block blockquote { font-size: 1.2rem !important; padding: 1rem 2rem; }
+            .print-visual .carousel-slide[data-template="quote"] .text-overlay-block blockquote::before,
+            .print-visual .carousel-slide[data-template="quote"] .text-overlay-block blockquote::after { font-size: 4rem !important; }
 
             .print-info { flex: 1; font-size: 14px; color: #000; font-family: monospace;}
             .print-header { font-size: 1.5rem; color: var(--brand-blue); border-bottom: 2px solid var(--brand-dark); margin-bottom: 1rem; padding-bottom: 0.5rem; }
@@ -291,6 +302,18 @@
                             </div>
                         </details>
 
+                        <details class="control-group" open>
+                            <summary>Controlli Tipografia</summary>
+                            <div class="form-group" id="quote-size-control">
+                                <label>Dimensione Testo Citazione</label>
+                                <select id="sel-quote-size" onchange="updateStyle('quoteSize', this.value)">
+                                    <option value="1.2rem">Piccolo (1.2rem)</option>
+                                    <option value="1.4rem" selected>Medio (1.4rem)</option>
+                                    <option value="1.6rem">Grande (1.6rem)</option>
+                                    <option value="1.8rem">Extra Large (1.8rem)</option>
+                                </select>
+                            </div>
+                        </details>
                         <details class="control-group" open>
                             <summary>Colori (Tutto Giallo Attivo)</summary>
                             <div style="margin-top: 1rem;">
@@ -428,7 +451,7 @@ OUTPUT JSON (Obbligatorio):
       "testo_html": "HTML della slide come da istruzioni",
       "suggerimento_visual": "Descrizione immagine...",
       "background_image": null,
-      "text_styles": { "colors": {"bg": "#ffffff", "text": "#333333", "accent": "#0146bc", "deco": "#eddc01"}, "template": "full" }
+      "text_styles": { "colors": {"bg": "#ffffff", "text": "#333333", "accent": "#0146bc", "deco": "#eddc01"}, "template": "full", "quoteSize": "1.4rem" }
     }
   ]
 }
@@ -456,7 +479,8 @@ OUTPUT JSON (Obbligatorio):
                     bgImage: s.background_image || null,
                     styles: s.text_styles || { 
                         colors: { bg: BRAND.light, text: BRAND.textDark, accent: BRAND.blue, deco: BRAND.yellow }, 
-                        template: 'full' 
+                        template: 'full',
+                        quoteSize: '1.4rem' // Default size
                     }
                 }));
 
@@ -480,6 +504,11 @@ OUTPUT JSON (Obbligatorio):
             // Applicazione Colori CSS
             const c = slideData.styles.colors || { bg: BRAND.light, text: BRAND.textDark, accent: BRAND.blue, deco: BRAND.yellow };
             wrapper.style.setProperty('--colore-sfondo-slide', c.bg);
+
+            // Applicazione Dimensione Testo Citazione
+            if(slideData.styles.quoteSize) {
+                wrapper.style.setProperty('--quote-font-size', slideData.styles.quoteSize);
+            }
 
             const textBlock = document.createElement('div');
             textBlock.className = 'text-overlay-block';
@@ -519,13 +548,15 @@ OUTPUT JSON (Obbligatorio):
             
             const setSelect = (id, val) => {
                 const el = document.getElementById(id);
-                if(el.querySelector(`option[value='${val}']`)) el.value = val;
+                if(el && el.querySelector(`option[value='${val}']`)) el.value = val;
             };
 
             setSelect('sel-bg', c.bg);
             setSelect('sel-text', c.text);
             setSelect('sel-accent', c.accent);
             setSelect('sel-deco', c.deco);
+            setSelect('sel-quote-size', slide.styles.quoteSize || '1.4rem');
+
 
             // Highlight template btn
             document.querySelectorAll('.template-grid .icon-btn').forEach(b => {
@@ -547,6 +578,7 @@ OUTPUT JSON (Obbligatorio):
                  slidesData[currentSlideIdx].html = `<h1>Statistica</h1><span class="big-stat">85%</span><p>Di Risparmio</p>`;
             }
             if(tpl === 'quote' && !currentHtml.includes('<footer>')) {
+                // Aggiungiamo il default del box intenzionale quando si imposta il template quote
                 const quoteContent = currentHtml.includes('blockquote') ? currentHtml.match(/<blockquote>(.*?)<\/blockquote>/s)[0] : `<blockquote>${LOREM_BODY}</blockquote>`;
                 slidesData[currentSlideIdx].html = `<h1>Citazione Leader</h1>${quoteContent}<footer><strong>Nome Cognome</strong><span>Ruolo Aziendale</span></footer>`;
             }
@@ -559,9 +591,14 @@ OUTPUT JSON (Obbligatorio):
 
         function updateStyle(prop, val) {
             if(!slidesData[currentSlideIdx].styles) slidesData[currentSlideIdx].styles = {};
-            if(!slidesData[currentSlideIdx].styles.colors) slidesData[currentSlideIdx].styles.colors = {};
+
+            if(prop === 'bg' || prop === 'text' || prop === 'accent' || prop === 'deco') {
+                if(!slidesData[currentSlideIdx].styles.colors) slidesData[currentSlideIdx].styles.colors = {};
+                slidesData[currentSlideIdx].styles.colors[prop] = val;
+            } else if (prop === 'quoteSize') {
+                slidesData[currentSlideIdx].styles.quoteSize = val;
+            }
             
-            slidesData[currentSlideIdx].styles.colors[prop] = val;
             renderCurrentSlide();
         }
 
@@ -595,7 +632,8 @@ OUTPUT JSON (Obbligatorio):
                 visualDesc: "Nuova slide generata manualmente con Lorem Ipsum",
                 styles: { 
                     template: 'full', 
-                    colors: { bg: BRAND.light, text: BRAND.textDark, accent: BRAND.blue, deco: BRAND.yellow } 
+                    colors: { bg: BRAND.light, text: BRAND.textDark, accent: BRAND.blue, deco: BRAND.yellow },
+                    quoteSize: '1.4rem' // Default size
                 }
             });
             currentSlideIdx++;
