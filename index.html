@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <style>
-        /* --- STILI (Invariati rispetto alla versione precedente, ma inclusi per completezza) --- */
+        /* --- STILI --- */
         :root {
             --brand-blue: #0146bc;
             --brand-yellow: #eddc01;
@@ -192,6 +192,7 @@
                                 <button onclick="formatText('bold')"><b>B</b></button>
                                 <button onclick="formatText('italic')"><i>I</i></button>
                                 <button onclick="formatText('removeFormat')">Tx</button>
+                                
                                 <select id="color-selector" onchange="formatText('foreColor', this.value)" style="flex-grow: 1;">
                                     <option value="" disabled selected>Colore...</option>
                                     <option value="#000000">Nero</option>
@@ -343,7 +344,34 @@
         function generatePrompt() {
             const arg = document.getElementById('inp-argomento').value;
             const txt = document.getElementById('inp-contenuto').value;
-            const prompt = `Agisci come Social Media Manager... (Prompt invariato)`;
+            const prompt = `
+Agisci come Social Media Manager esperto. Crea uno storyboard per un carosello (4-8 slide) basato su questi dati.
+ARGOMENTO: ${arg}
+INPUT: ${txt}
+
+ISTRUZIONI PER I LAYOUT (Scegli il template migliore per ogni slide):
+1. "full": Per copertine o concetti generali (Default).
+2. "quote": Per citazioni. HTML OBBLIGATORIO: <blockquote>Frase</blockquote><footer><strong>Nome Cognome</strong><span>Ruolo</span></footer>.
+3. "stat": Per numeri/dati. HTML OBBLIGATORIO: <span class="big-stat">NUMERO</span><p>Descrizione</p>.
+4. "list": Per elenchi puntati. Usa tag <ul> e <li>.
+5. "img-left" o "img-right": Quando c'è un concetto specifico che richiede un'immagine affiancata al testo.
+6. "card": Per evidenziare un concetto dentro un box.
+
+OUTPUT JSON OBBLIGATORIO (Nessun testo extra):
+{
+  "copy_post": "Testo accattivante per il post (caption)...",
+  "slides": [
+    {
+      "testo_html": "Codice HTML della slide seguendo le regole sopra...",
+      "suggerimento_visual": "Descrizione dettagliata per l'immagine...",
+      "text_styles": { 
+          "template": "Inserisci qui il codice template scelto (es. quote, stat, img-left...)", 
+          "colors": {"bg": "#ffffff", "text": "#333333", "accent": "#0146bc", "deco": "#eddc01"} 
+      }
+    }
+  ]
+}
+`;
             document.getElementById('out-prompt').value = prompt.trim();
             document.getElementById('prompt-result').style.display = 'block';
         }
@@ -500,7 +528,56 @@
             const a = document.createElement('a'); a.href = url; a.download = 'brand-carousel.json'; a.click();
         }
         function importJsonFile(e) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(evt) { document.getElementById('json-input').value = evt.target.result; parseAndRender(); }; reader.readAsText(file); }
-        function exportWord() { if(slidesData.length === 0) return alert("Nessun dato"); let html = `...`; /* (Codice Word invariato) */ } // Lascio vuoto per brevità, funziona come prima
+
+        // --- EXPORT WORD ---
+        function exportWord() {
+            if(slidesData.length === 0) return alert("Nessun dato da esportare");
+            
+            let htmlContent = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head><meta charset='utf-8'><title>Export Word</title>
+            <style>
+                body { font-family: Arial, sans-serif; }
+                table { border-collapse: collapse; width: 100%; }
+                td, th { border: 1px solid #999; padding: 0.5rem; vertical-align: top; }
+                th { background: #eee; }
+                h1 { color: #0146bc; }
+                .copy-box { background: #f0f0f0; padding: 1rem; margin-bottom: 2rem; white-space: pre-wrap; }
+            </style>
+            </head><body>
+            <h1>Storyboard Carosello</h1>
+            <h3>Copy / Caption del Post</h3>
+            <div class="copy-box">${copyPost}</div>
+            <h3>Dettaglio Slide</h3>
+            <table>
+                <thead><tr><th width="10%">N.</th><th width="50%">Contenuto Testuale</th><th width="40%">Note Visual & Template</th></tr></thead>
+                <tbody>
+            `;
+            
+            slidesData.forEach((slide, i) => {
+                let cleanText = slide.html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                htmlContent += `
+                    <tr>
+                        <td><strong>${i+1}</strong></td>
+                        <td>${slide.html}</td>
+                        <td>
+                            <strong>Template:</strong> ${slide.styles.template}<br>
+                            <strong>Visual AI:</strong> ${slide.visualDesc}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            htmlContent += `</tbody></table></body></html>`;
+            
+            const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'storyboard-testi.doc';
+            a.click();
+        }
+
         function exportPdf() { window.print(); }
 
         // --- EXPORT PNG ZIP ---
