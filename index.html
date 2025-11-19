@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generatore Carosello Brand PRO - All in One</title>
+    <title>Generatore Carosello Brand PRO</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <style>
         /* --- VARIABILI BRAND --- */
@@ -57,14 +61,16 @@
         .tab-content.active { display: block; }
 
         /* --- INPUTS & CONTROLS --- */
-        .section-title {
-            color: var(--brand-blue); border-bottom: 3px solid var(--brand-yellow); padding-bottom: 0.5rem; margin-bottom: 1.5rem; font-size: 1.25rem;
-        }
+        .section-title { color: var(--brand-blue); border-bottom: 3px solid var(--brand-yellow); padding-bottom: 0.5rem; margin-bottom: 1.5rem; font-size: 1.25rem; }
         .form-group { margin-bottom: 1.5rem; }
         label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #444; font-size: 0.9rem; }
         input[type="text"], textarea, select { width: 100%; padding: 0.75rem; border: 2px solid var(--colore-bordo-ui); border-radius: 8px; font-size: 1rem; font-family: inherit; background: #fff; transition: border 0.2s; }
         input:focus, textarea:focus, select:focus { border-color: var(--brand-blue); outline: none; }
         textarea { resize: vertical; min-height: 120px; }
+
+        /* Range Slider Custom */
+        input[type=range] { width: 100%; cursor: pointer; }
+        .range-value { font-size: 0.9rem; font-weight: bold; color: var(--brand-blue); float: right; }
 
         .btn { padding: 0.75rem 1.5rem; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: transform 0.1s, background 0.2s; font-size: 0.95rem; }
         .btn:active { transform: scale(0.98); }
@@ -114,39 +120,62 @@
 
         /* --- TEMPLATES --- */
 
-        /* 5. QUOTE (Modificato per Spazio Foto) */
+        /* 5. QUOTE (Ottimizzato) */
         .carousel-slide[data-template="quote"] { 
-            justify-content: flex-end; /* Spinge il contenuto in basso */
-            align-items: center; text-align: center; padding: 4rem !important; 
+            justify-content: flex-start; 
+            padding-top: 2rem !important;
+            align-items: center; text-align: center; 
             --quote-font-size: 1.4rem;
+            gap: 1.5rem; 
         }
         
-        /* Guida Visiva per la foto (visibile solo a schermo, non in stampa/export immagine) */
-        .carousel-slide[data-template="quote"]::before {
-            content: "FOTO MANAGER";
-            display: flex; align-items: center; justify-content: center; text-align: center;
-            font-size: 0.8rem; color: rgba(0,0,0,0.3); font-weight: bold;
-            width: 160px; height: 160px;
-            border: 2px dashed rgba(0,0,0,0.2); border-radius: 50%;
-            position: absolute; top: 12%; left: 50%; transform: translateX(-50%);
-            z-index: 0; pointer-events: none;
+        /* Foto Manager */
+        .manager-photo-wrapper {
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            background-size: cover; background-position: center;
+            border: 3px solid var(--brand-light);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            background-color: rgba(255,255,255,0.1);
+            z-index: 2; margin-top: 1rem;
         }
-        
-        .carousel-slide[data-template="quote"] .text-overlay-block {
-            position: relative; z-index: 1;
-            margin-top: 160px; /* Lascia lo spazio per la foto */
-        }
+        .manager-photo-wrapper.empty { border: 2px dashed rgba(255,255,255,0.3); background: transparent; }
+        .manager-photo-wrapper.empty::after { content: "FOTO"; color: rgba(255,255,255,0.5); font-weight: bold; font-size: 0.8rem; }
 
+        /* Box Citazione */
         .carousel-slide[data-template="quote"] .text-overlay-block blockquote {
             background: rgba(255, 255, 255, 0.1);
-            border: none; padding: 1.5rem 3rem; margin: 0; 
+            border: none; 
+            padding: 2.5rem 2rem 2rem 2rem; /* Padding ottimizzato */
+            margin: 0 auto; 
+            width: 90%; 
+            min-height: 160px;
+            display: flex; flex-direction: column; justify-content: center; 
             font-size: var(--quote-font-size); 
-            font-weight: 400; font-style: italic; line-height: 1.4; color: var(--colore-testo-p); position: relative; display: inline-block;
-            border-radius: 8px;
+            font-weight: 400; font-style: italic; line-height: 1.4; color: var(--colore-testo-p); 
+            position: relative; 
+            border-radius: 12px;
         }
-        .carousel-slide[data-template="quote"] .text-overlay-block blockquote::before { content: "“"; font-family: serif; font-size: 6rem; line-height: 0; position: absolute; top: 0; left: -2rem; color: var(--colore-deco); opacity: 1; }
-        .carousel-slide[data-template="quote"] .text-overlay-block blockquote::after { content: "”"; font-family: serif; font-size: 6rem; line-height: 0; position: absolute; bottom: -2rem; right: -2rem; color: var(--colore-deco); opacity: 1; }
-        .carousel-slide[data-template="quote"] footer { margin-top: 2.5rem; display: flex; flex-direction: column; align-items: center; position: relative; }
+        
+        /* Virgolette Ottimizzate */
+        .carousel-slide[data-template="quote"] .text-overlay-block blockquote::before { 
+            content: "“"; font-family: 'Times New Roman', serif; font-size: 6rem; line-height: 1; 
+            position: absolute; 
+            top: -1.5rem; left: -0.5rem; /* Posizione ottimizzata */
+            color: var(--colore-deco); opacity: 1; 
+            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .carousel-slide[data-template="quote"] .text-overlay-block blockquote::after { 
+            content: "”"; font-family: 'Times New Roman', serif; font-size: 6rem; line-height: 1; 
+            position: absolute; 
+            bottom: -3rem; right: -0.5rem; /* Posizione ottimizzata */
+            color: var(--colore-deco); opacity: 1;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .carousel-slide[data-template="quote"] footer { margin-top: 1.5rem; display: flex; flex-direction: column; align-items: center; position: relative; }
         .carousel-slide[data-template="quote"] footer::before { content: ""; width: 50px; height: 3px; background-color: var(--colore-deco); margin-bottom: 1rem; }
         .carousel-slide[data-template="quote"] footer strong { display: block; font-size: 1.2rem; color: var(--colore-testo-h1); font-weight: 800; }
         .carousel-slide[data-template="quote"] footer span { display: block; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-top: 0.2rem; color: var(--colore-testo-p); }
@@ -185,16 +214,15 @@
         .nav-arrow { background: var(--brand-blue); color: #fff; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; transition: background 0.2s;}
         .nav-arrow:disabled { background: #ccc; cursor: not-allowed; }
 
-        /* --- STAMPA PDF STORYBOARD (NUOVO LAYOUT) --- */
+        /* --- STAMPA PDF STORYBOARD --- */
         @media print {
             body * { visibility: hidden; }
             #print-container, #print-container * { visibility: visible; }
             #print-container { position: absolute; top: 0; left: 0; width: 100%; background: #fff; color: #000; }
             @page { margin: 1.5cm; size: A4; }
             
-            /* Nascondiamo la guida foto manager in stampa */
-            .carousel-slide[data-template="quote"]::before { display: none !important; }
-            .carousel-slide[data-template="quote"] .text-overlay-block { margin-top: 0 !important; } /* Reset margine foto */
+            /* In stampa mostriamo la foto manager se c'è, altrimenti nulla */
+            .manager-photo-wrapper.empty { display: none; }
 
             .print-header { margin-bottom: 2rem; border-bottom: 4px solid var(--brand-blue); padding-bottom: 1rem; }
             .print-header h1 { margin: 0; color: var(--brand-blue); font-size: 24pt; }
@@ -213,22 +241,18 @@
                 -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
             
-            /* Ridimensionamento contenuto per la stampa */
             .print-visual .carousel-slide { padding: 1rem !important; }
             .print-visual h1 { font-size: 16pt !important; }
             .print-visual p { font-size: 11pt !important; }
             .print-visual .big-stat { font-size: 36pt !important; }
-            .print-visual blockquote { font-size: 14pt !important; padding: 1rem !important; }
+            .print-visual blockquote { font-size: 12pt !important; padding: 1rem !important; }
             
-            /* Forza background in stampa */
             .print-visual .carousel-slide[data-template="img-left"], 
             .print-visual .carousel-slide[data-template="img-right"] { 
                 background-size: 50% 100% !important; -webkit-print-color-adjust: exact;
             }
 
             .print-info h3 { margin-top: 0; color: var(--brand-blue); border-bottom: 2px solid var(--brand-yellow); display: inline-block; padding-bottom: 5px; }
-            .print-info p { margin-bottom: 0.5rem; }
-            .print-notes { margin-top: 2rem; border: 1px dashed #ccc; height: 100px; padding: 0.5rem; color: #ccc; }
         }
     </style>
 </head>
@@ -270,10 +294,7 @@
                 <div class="preview-area-wrapper">
                     <div class="carousel-preview-container">
                         <div id="carousel-scroller" class="carousel-scroller">
-                            <div class="carousel-slide" style="justify-content: center; align-items: center; text-align: center; color: #888;">
-                                <p>Carica un JSON o aggiungi una Slide manuale</p>
                             </div>
-                        </div>
                     </div>
                     <div class="carousel-nav">
                         <button class="nav-arrow" id="btn-prev" onclick="moveSlide(-1)" disabled>&larr;</button>
@@ -314,6 +335,15 @@
                             </div>
                         </div>
                         
+                        <div class="control-group" id="manager-photo-controls" style="display:none;">
+                            <summary>Foto Manager</summary>
+                            <div style="margin-top: 0.5rem;">
+                                <button class="btn btn-neutral" style="width:100%" onclick="document.getElementById('manager-upload').click()">Carica Foto Cerchio</button>
+                                <input type="file" id="manager-upload" style="display:none" accept="image/*" onchange="uploadManagerPhoto(event)">
+                                <button class="btn btn-danger" style="width:100%; margin-top:0.5rem;" onclick="removeManagerPhoto()">Rimuovi Foto</button>
+                            </div>
+                        </div>
+                        
                         <details class="control-group" open>
                             <summary>Layout & Template</summary>
                             <div class="template-grid">
@@ -328,6 +358,11 @@
                                 <button class="icon-btn" data-tpl="list" onclick="setTemplate('list')">Elenco</button>
                             </div>
                         </details>
+
+                        <div class="control-group" id="quote-size-control" style="display:none;">
+                            <label>Dimensione Testo Citazione: <span id="quote-size-val" class="range-value">1.4rem</span></label>
+                            <input type="range" id="rng-quote-size" min="0.8" max="3.0" step="0.1" value="1.4" oninput="updateStyle('quoteSize', this.value)">
+                        </div>
 
                         <details class="control-group">
                             <summary>Colori</summary>
@@ -361,7 +396,7 @@
                         </details>
 
                         <details class="control-group">
-                            <summary>Immagine</summary>
+                            <summary>Immagine Sfondo</summary>
                             <button class="btn btn-neutral" style="width:100%" onclick="document.getElementById('img-upload').click()">Carica Sfondo</button>
                             <input type="file" id="img-upload" style="display:none" accept="image/*" onchange="uploadImage(event)">
                             <button class="btn btn-danger" style="width:100%; margin-top:0.5rem;" onclick="removeImage()">Rimuovi</button>
@@ -370,8 +405,8 @@
                         <div class="control-group">
                             <summary>Gestione Slide</summary>
                             <div class="button-grid" style="margin-top: 0.5rem;">
-                                <button class="btn btn-neutral" onclick="moveSlideSequence(-1)" title="Sposta slide corrente indietro">▲ Sposta Su</button>
-                                <button class="btn btn-neutral" onclick="moveSlideSequence(1)" title="Sposta slide corrente avanti">▼ Sposta Giù</button>
+                                <button class="btn btn-neutral" onclick="moveSlideSequence(-1)" title="Sposta indietro">▲ Sposta Su</button>
+                                <button class="btn btn-neutral" onclick="moveSlideSequence(1)" title="Sposta avanti">▼ Sposta Giù</button>
                             </div>
                             <div class="button-grid" style="margin-top: 0.5rem;">
                                 <button class="btn btn-secondary" onclick="addSlide()">+ Standard</button>
@@ -387,8 +422,9 @@
                         <div class="button-grid">
                             <button class="btn btn-neutral" onclick="exportJson()">Salva JSON</button>
                             <button class="btn btn-primary" onclick="exportWord()">SCARICA WORD</button>
-                            <button class="btn btn-primary" onclick="exportPdf()">STAMPA PDF</button>
                         </div>
+                        <button class="btn btn-primary" style="width:100%; margin-top:0.5rem; background-color:#000;" onclick="exportPngZip()">SCARICA IMMAGINI (ZIP)</button>
+                        <button class="btn btn-neutral" style="width:100%; margin-top:0.5rem; font-size:0.8rem;" onclick="exportPdf()">Stampa PDF Storyboard</button>
                     </div>
                 </div>
             </div>
@@ -414,6 +450,15 @@
         let slidesData = [];
         let currentSlideIdx = 0;
         let copyPost = "";
+
+        // --- INIZIALIZZAZIONE ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // Se non ci sono dati, inizializza con una slide vuota
+            if(slidesData.length === 0) {
+                addEmptySlide();
+                document.getElementById('visual-controls').style.display = 'block';
+            }
+        });
 
         // --- FORMATTAZIONE TESTO ---
         function formatText(command, value = null) {
@@ -485,6 +530,7 @@ OUTPUT JSON OBBLIGATORIO (Nessun testo extra):
                     html: s.testo_html || `<h1>${LOREM_TITLE}</h1><p>${LOREM_BODY}</p>`,
                     visualDesc: s.suggerimento_visual || "",
                     bgImage: s.background_image || null,
+                    managerImage: s.manager_image || null, 
                     styles: s.text_styles || { 
                         colors: { bg: BRAND.light, text: BRAND.textDark, accent: BRAND.blue, deco: BRAND.yellow }, 
                         template: 'full',
@@ -512,6 +558,19 @@ OUTPUT JSON OBBLIGATORIO (Nessun testo extra):
             wrapper.style.setProperty('--colore-sfondo-slide', c.bg);
             if(slideData.styles.quoteSize) wrapper.style.setProperty('--quote-font-size', slideData.styles.quoteSize);
 
+            // GESTIONE FOTO MANAGER (Solo per template Quote)
+            if(tpl === 'quote') {
+                const photoWrapper = document.createElement('div');
+                photoWrapper.className = 'manager-photo-wrapper';
+                if(slideData.managerImage) {
+                    photoWrapper.style.backgroundImage = `url(${slideData.managerImage})`;
+                    photoWrapper.classList.remove('empty');
+                } else {
+                    photoWrapper.classList.add('empty');
+                }
+                wrapper.appendChild(photoWrapper);
+            }
+
             const textBlock = document.createElement('div');
             textBlock.className = 'text-overlay-block';
             textBlock.innerHTML = slideData.html;
@@ -530,7 +589,10 @@ OUTPUT JSON OBBLIGATORIO (Nessun testo extra):
         function renderCurrentSlide() {
             const scroller = document.getElementById('carousel-scroller');
             scroller.innerHTML = '';
-            if(slidesData.length === 0) return;
+            if(slidesData.length === 0) {
+                scroller.innerHTML = '<div style="padding:2rem; text-align:center; color:#888;">Nessuna Slide</div>';
+                return;
+            }
 
             const slide = slidesData[currentSlideIdx];
             const domEl = createSlideDOM(slide);
@@ -540,18 +602,26 @@ OUTPUT JSON OBBLIGATORIO (Nessun testo extra):
             document.getElementById('btn-prev').disabled = currentSlideIdx === 0;
             document.getElementById('btn-next').disabled = currentSlideIdx === slidesData.length - 1;
             
-            const c = slide.styles.colors || { bg: BRAND.light, text: BRAND.textDark, accent: BRAND.blue, deco: BRAND.yellow };
             const tpl = slide.styles.template || 'full';
             
+            // MOSTRA/NASCONDI CONTROLLI SPECIFICI
+            document.getElementById('manager-photo-controls').style.display = (tpl === 'quote') ? 'block' : 'none';
+            document.getElementById('quote-size-control').style.display = (tpl === 'quote') ? 'block' : 'none';
+            
+            // Sync UI values
+            const c = slide.styles.colors || { bg: BRAND.light, text: BRAND.textDark, accent: BRAND.blue, deco: BRAND.yellow };
             const setSelect = (id, val) => {
                 const el = document.getElementById(id);
                 if(el && el.querySelector(`option[value='${val}']`)) el.value = val;
             };
-
             setSelect('sel-bg', c.bg);
             setSelect('sel-text', c.text);
             setSelect('sel-accent', c.accent);
-            setSelect('sel-deco', c.deco);
+            
+            // Sync Slider
+            const qSize = slide.styles.quoteSize || '1.4rem';
+            document.getElementById('rng-quote-size').value = parseFloat(qSize);
+            document.getElementById('quote-size-val').innerText = qSize;
 
             document.querySelectorAll('.template-grid .icon-btn').forEach(b => {
                 b.classList.toggle('active', b.dataset.tpl === tpl);
@@ -564,12 +634,9 @@ OUTPUT JSON OBBLIGATORIO (Nessun testo extra):
         function moveSlideSequence(direction) {
             const newIdx = currentSlideIdx + direction;
             if (newIdx < 0 || newIdx >= slidesData.length) return;
-            
-            // Scambia elementi nell'array
             const temp = slidesData[newIdx];
             slidesData[newIdx] = slidesData[currentSlideIdx];
             slidesData[currentSlideIdx] = temp;
-            
             currentSlideIdx = newIdx;
             renderCurrentSlide();
         }
@@ -591,7 +658,13 @@ OUTPUT JSON OBBLIGATORIO (Nessun testo extra):
 
         function updateStyle(prop, val) {
             if(!slidesData[currentSlideIdx].styles) slidesData[currentSlideIdx].styles = {};
-            if(!['quoteSize'].includes(prop)) {
+            
+            if(prop === 'quoteSize') {
+                 // Aggiunge 'rem' se viene dal range
+                 const valStr = val + 'rem';
+                 slidesData[currentSlideIdx].styles.quoteSize = valStr;
+                 document.getElementById('quote-size-val').innerText = valStr;
+            } else {
                 if(!slidesData[currentSlideIdx].styles.colors) slidesData[currentSlideIdx].styles.colors = {};
                 slidesData[currentSlideIdx].styles.colors[prop] = val;
             } 
@@ -610,6 +683,21 @@ OUTPUT JSON OBBLIGATORIO (Nessun testo extra):
             e.target.value = '';
         }
         function removeImage() { slidesData[currentSlideIdx].bgImage = null; renderCurrentSlide(); }
+        
+        // --- GESTIONE FOTO MANAGER ---
+        function uploadManagerPhoto(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                slidesData[currentSlideIdx].managerImage = evt.target.result;
+                renderCurrentSlide();
+            };
+            reader.readAsDataURL(file);
+            e.target.value = '';
+        }
+        function removeManagerPhoto() { slidesData[currentSlideIdx].managerImage = null; renderCurrentSlide(); }
+
 
         function addSlide() {
             const loremHtml = `<h1>${LOREM_TITLE}</h1><p>${LOREM_BODY}</p><blockquote>Punto chiave.</blockquote>`;
@@ -633,14 +721,20 @@ OUTPUT JSON OBBLIGATORIO (Nessun testo extra):
         }
 
         function removeSlide() {
-            if(slidesData.length <= 1) return;
+            if(slidesData.length <= 1) {
+                if(confirm("Eliminare l'unica slide?")) {
+                     slidesData = [];
+                     renderCurrentSlide();
+                }
+                return;
+            }
             if(!confirm("Eliminare slide?")) return;
             slidesData.splice(currentSlideIdx, 1);
             if(currentSlideIdx >= slidesData.length) currentSlideIdx = slidesData.length - 1;
             renderCurrentSlide();
         }
 
-        // --- EXPORT ---
+        // --- EXPORT JSON / WORD ---
         function exportJson() {
             const data = { copy_post: copyPost, slides: slidesData };
             const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
@@ -663,95 +757,111 @@ OUTPUT JSON OBBLIGATORIO (Nessun testo extra):
 
         function exportWord() {
             if(slidesData.length === 0) return alert("Nessun dato da esportare");
-            
-            let htmlContent = `
-            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-            <head><meta charset='utf-8'><title>Export Word</title>
-            <style>
-                body { font-family: Arial, sans-serif; }
-                table { border-collapse: collapse; width: 100%; }
-                td, th { border: 1px solid #999; padding: 0.5rem; vertical-align: top; }
-                th { background: #eee; }
-                h1 { color: #0146bc; }
-                .copy-box { background: #f0f0f0; padding: 1rem; margin-bottom: 2rem; white-space: pre-wrap; }
-            </style>
-            </head><body>
-            <h1>Storyboard Carosello</h1>
-            <h3>Copy / Caption del Post</h3>
-            <div class="copy-box">${copyPost}</div>
-            <h3>Dettaglio Slide</h3>
-            <table>
-                <thead><tr><th width="10%">N.</th><th width="50%">Contenuto Testuale</th><th width="40%">Note Visual & Template</th></tr></thead>
-                <tbody>
-            `;
-            
+            let htmlContent = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><title>Export Word</title><body><h1>Storyboard Carosello</h1><h3>Copy</h3><div>${copyPost}</div><hr><table>`;
             slidesData.forEach((slide, i) => {
-                // Rimuovi tag HTML per una lettura pulita in tabella Word
-                let cleanText = slide.html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-                htmlContent += `
-                    <tr>
-                        <td><strong>${i+1}</strong></td>
-                        <td>${slide.html}</td>
-                        <td>
-                            <strong>Template:</strong> ${slide.styles.template}<br>
-                            <strong>Visual AI:</strong> ${slide.visualDesc}
-                        </td>
-                    </tr>
-                `;
+                htmlContent += `<tr><td>${i+1}</td><td>${slide.html}</td><td>${slide.visualDesc}</td></tr>`;
             });
-            
-            htmlContent += `</tbody></table></body></html>`;
-            
+            htmlContent += `</table></body></html>`;
             const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = 'storyboard-testi.doc';
+            a.href = url; a.download = 'storyboard-testi.doc';
             a.click();
         }
 
         function exportPdf() {
             const container = document.getElementById('print-container');
             container.innerHTML = '';
-            
-            const header = document.createElement('div');
-            header.className = 'print-header';
-            header.innerHTML = '<h1>Storyboard Visuale</h1>';
-            container.appendChild(header);
-
-            const copyBox = document.createElement('div');
-            copyBox.className = 'print-copy-section';
-            copyBox.innerHTML = `<strong>COPY (CAPTION):</strong>\n\n${copyPost}`;
-            container.appendChild(copyBox);
+            const header = document.createElement('div'); header.className = 'print-header'; header.innerHTML = '<h1>Storyboard Visuale</h1>'; container.appendChild(header);
+            const copyBox = document.createElement('div'); copyBox.className = 'print-copy-section'; copyBox.innerHTML = `<strong>COPY:</strong><br>${copyPost}`; container.appendChild(copyBox);
 
             slidesData.forEach((slide, idx) => {
-                const row = document.createElement('div');
-                row.className = 'print-slide-row';
-
-                // Colonna Visuale
-                const visual = document.createElement('div');
-                visual.className = 'print-visual';
-                const domClone = createSlideDOM(slide);
-                domClone.querySelector('.text-overlay-block').contentEditable = false;
+                const row = document.createElement('div'); row.className = 'print-slide-row';
+                const visual = document.createElement('div'); visual.className = 'print-visual';
+                const domClone = createSlideDOM(slide); domClone.querySelector('.text-overlay-block').contentEditable = false;
                 visual.appendChild(domClone);
-
-                // Colonna Info
-                const info = document.createElement('div');
-                info.className = 'print-info';
-                info.innerHTML = `
-                    <h3>Slide ${idx+1}</h3>
-                    <p><strong>Template:</strong> ${slide.styles.template}</p>
-                    <p><strong>Suggerimento Immagine:</strong><br>${slide.visualDesc}</p>
-                    <div class="print-notes">Spazio per note manuali...</div>
-                `;
-
-                row.appendChild(visual);
-                row.appendChild(info);
-                container.appendChild(row);
+                const info = document.createElement('div'); info.className = 'print-info';
+                info.innerHTML = `<h3>Slide ${idx+1}</h3><p><strong>Template:</strong> ${slide.styles.template}</p><p><strong>Visual:</strong> ${slide.visualDesc}</p>`;
+                row.appendChild(visual); row.appendChild(info); container.appendChild(row);
             });
-
             window.print();
         }
+
+        // --- EXPORT PNG ZIP (NUOVA FUNZIONE) ---
+        async function exportPngZip() {
+            if (slidesData.length === 0) return alert("Nessuna slide da esportare.");
+            
+            const zip = new JSZip();
+            const folder = zip.folder("carosello_images");
+            const tempContainer = document.createElement('div');
+            
+            // Setup contenitore temporaneo off-screen ma renderizzato
+            tempContainer.style.position = "absolute";
+            tempContainer.style.top = "-9999px";
+            tempContainer.style.left = "-9999px";
+            tempContainer.style.width = "1080px"; // Risoluzione alta
+            tempContainer.style.height = "1350px"; // 4:5 ratio
+            document.body.appendChild(tempContainer);
+
+            // Mostra loading o feedback
+            const btn = document.querySelector('button[onclick="exportPngZip()"]');
+            const oldText = btn.innerText;
+            btn.innerText = "Generazione in corso...";
+            btn.disabled = true;
+
+            try {
+                for (let i = 0; i < slidesData.length; i++) {
+                    // Pulisci container
+                    tempContainer.innerHTML = '';
+                    
+                    // Crea slide DOM
+                    const slideDOM = createSlideDOM(slidesData[i]);
+                    
+                    // Forza stili per alta risoluzione
+                    slideDOM.style.width = "100%";
+                    slideDOM.style.height = "100%";
+                    slideDOM.style.fontSize = "32px"; // Scala font base per risoluzione 1080px
+                    
+                    // Disabilita editabili e guide
+                    const textBlock = slideDOM.querySelector('.text-overlay-block');
+                    if(textBlock) textBlock.contentEditable = false;
+                    
+                    // Rimuovi guida foto manager se vuota
+                    const photoGuide = slideDOM.querySelector('.manager-photo-wrapper.empty');
+                    if(photoGuide) photoGuide.style.display = 'none';
+
+                    // Aggiungi al container
+                    tempContainer.appendChild(slideDOM);
+
+                    // Renderizza canvas
+                    const canvas = await html2canvas(slideDOM, {
+                        scale: 1, // Già dimensionato a 1080px
+                        useCORS: true, // Per immagini esterne
+                        backgroundColor: null
+                    });
+
+                    // Converti in Blob
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                    
+                    // Aggiungi al ZIP
+                    folder.file(`slide_${i + 1}.png`, blob);
+                }
+
+                // Genera ZIP
+                const content = await zip.generateAsync({type: "blob"});
+                saveAs(content, "carosello_brand.zip");
+
+            } catch (err) {
+                console.error(err);
+                alert("Errore durante l'esportazione: " + err.message);
+            } finally {
+                // Pulisci
+                document.body.removeChild(tempContainer);
+                btn.innerText = oldText;
+                btn.disabled = false;
+            }
+        }
+
     </script>
 </body>
 </html>
